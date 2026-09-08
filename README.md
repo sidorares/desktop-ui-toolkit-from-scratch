@@ -4,8 +4,8 @@ A talk for MelbJS about [react-x11](https://github.com/sidorares/react-x11) —
 presented in an app built with react-x11.
 
 The deck is an X11 client. The slides are markdown; the demos are live
-components; the terminal on slide 2 is a real shell, slide 14 is the
-component library demonstrating itself, and slide 15 reads the calendar the
+components; the terminal on slide 2 is a real shell, slide 19 is the
+component library demonstrating itself, and slide 20 reads the calendar the
 desktop already has.
 
 ## Running it
@@ -97,7 +97,7 @@ has to name a number.
 
 ## On the Dock
 
-The deck badges its own icon with where the talk has got to — `11 / 26`, the
+The deck badges its own icon with where the talk has got to — `11 / 37`, the
 same string the footer carries — through react-x11's `useBadge`. So the
 position is readable from the Dock with something else in front of the deck,
 which is the case a presenter is actually in: notes on one screen, the deck
@@ -181,7 +181,8 @@ shell one-liner keep its quotes and its pipe.
 | `<Wire>` | a node-x11 example, and a button that runs it through x11vis |
 | `<DevTools>` | starts React DevTools, then an app with the bridge on |
 | `<HotReload>` | starts an app under the refresh loader, and edits its source |
-| `<Placeholder>` | a box the size a demo will be, for one that isn't built |
+| `<ChartsDemo>` | a button that opens the charts example in its own window |
+| `<Placeholder>` | a box the size a demo will be, for one that isn't built — **no slide may ship naming it**, see [Smoke](#smoke) |
 | `<Widgets>` | core's controls, a variable font's axes and an `<svg>`, on one wire |
 | `<Documents>` | markdown, maths and HTML behind one strip of `<Tabs>` |
 | `<DataViz>` | `panel=` a series, a sequence, or the architecture graph |
@@ -189,8 +190,8 @@ shell one-liner keep its quotes and its pipe.
 | `<SourceCode>` | a file off disk, highlighted — the demo's own, usually |
 | `<Booking>` | a flight booking that reads the desktop's calendar |
 
-`<DataViz>` and `<Scenes>` are five of slide 14's seven steps, one `panel`
-each; `<Booking>` is slide 15. Between them the showcase is every component
+`<DataViz>` and `<Scenes>` are five of slide 19's seven steps, one `panel`
+each; `<Booking>` is slide 20. Between them the showcase is every component
 this talk claims: `<box>`, `<text>`, `<textinput>` and core's widgets;
 variable-font axes read off the font file; `<svg>`; `<Markdown>`, `<Formula>`
 and `<Html>`; `<Tabs>`; charts, the timeline, the flow pane with three nodes
@@ -240,7 +241,7 @@ And because `<Prose>` is remounted on every keypress, the processes are held
 in a module-scope store rather than in component state — stepping away from a
 slide and back finds the demo still running.
 
-**React DevTools** (17) — `npm run devtools`, then `npm run example:devtools`. The
+**React DevTools** (22) — `npm run devtools`, then `npm run example:devtools`. The
 button does both, in that order, because the backend connects to a socket
 that has to already be listening. The deck cannot inspect *itself*:
 `REACT_X11_DEVTOOLS` is read before React's first commit, so what opens is a
@@ -250,7 +251,7 @@ devDependencies, so `npm install` has them; the first drags in Electron, which
 is most of the install. A DevTools already listening on 8097 is used as it
 stands rather than replaced.
 
-**Hot reload** (18) — `npm run example:hot`. The second button rewrites two marked
+**Hot reload** (23) — `npm run example:hot`. The second button rewrites two marked
 lines in [`examples/hot-demo-app.jsx`](examples/hot-demo-app.jsx), which is a
 save like any other: the loader's watcher applies it, and the count and the
 half-typed text on screen do not move. The variants cycle and the third press
@@ -344,3 +345,40 @@ Present on Cocoa.
 Anything here that turns out to be generally useful belongs in
 [`@react-x11/components`](https://github.com/sidorares/react-x11-components)
 instead — which is the loop the talk itself is about.
+
+## Smoke
+
+```bash
+npm run smoke
+```
+
+Parses every slide and prints one line each — step count, layout, whether it
+has notes, and which components it names, flagging any name that is not a key
+in the map. Then it **exits non-zero if any slide still names
+`<Placeholder>`**.
+
+That last check is the point. A placeholder draws a labelled box the size the
+demo will be, which is right while a slide is being written and wrong on a
+projector — and the failure mode is that nobody notices, because a
+placeholder looks deliberate. Finishing the demos should not be something to
+remember the night before.
+
+## The charts example
+
+```bash
+npm run example:charts
+```
+
+`@react-x11/components`' own `examples/charts.tsx`, copied in with its import
+repointed at the published package, and the button on slide 31 starts it.
+
+It is a **separate process with its own window** on purpose. The panel on that
+slide draws this deck's commit history — a few dozen points, the right size
+for a slide and the wrong size for the claim. "Cost follows pixels, not
+points" needs a million points, its own frame clock, and a HUD reporting what
+the last painted frame actually cost: mode, span, command count, estimated
+wire bytes. Zoom in and out of the million and the byte count does not move.
+
+A chart sharing this deck's connection would be reporting this deck's frames,
+and a demo that can wedge itself on a million points should not be able to
+take the talk down with it.

@@ -2,7 +2,7 @@
   "name": "desktop-ui-toolkit-from-scratch",
   "version": "0.0.0",
   "private": true,
-  "description": "\"Making a Desktop UI Toolkit From Scratch\" — a talk about react-x11, presented in an app built with react-x11",
+  "description": "\"Making a Desktop UI Toolkit From Scratch\" \u2014 a talk about react-x11, presented in an app built with react-x11",
   "type": "module",
   "engines": {
     "node": ">=20.19"
@@ -17,7 +17,8 @@
     "typecheck": "tsc --noEmit",
     "shot": "tsx scripts/shot.tsx",
     "render": "tsx scripts/render.tsx",
-    "smoke": "tsx scripts/smoke.ts"
+    "smoke": "tsx scripts/smoke.ts",
+    "example:charts": "tsx examples/charts.tsx"
   },
   "dependencies": {
     "@lydell/node-pty": "^1.1.0",

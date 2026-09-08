@@ -1,46 +1,38 @@
 ---
-title: All of it at once
+title: Two of the four, running
 reveal: replace
 notes: |
   DEMO SLIDE — 3 min, hard stop. `reveal: replace`, so each step swaps the
-  demo rather than stacking them; arrow DOWN between them.
-  Order: charts (decimation), terminal (flood), flow (pan and zoom), 3D
-  (display lists). Say one sentence per demo, then move.
-  If you are behind schedule, cut to charts and terminal only — they carry
-  the argument and the other two are eye candy.
-  The real examples in the repo are richer than these; alt-tab to them if
-  the room is engaged and you have time.
+  demo rather than stacking it; arrow DOWN between them.
+  Two demos, not four. "Don't redraw what did not move" and "don't send it
+  twice" were both on the showcase slide already — the flow graph pans and
+  zooms over a subtree scale, and the GL scene is one CallList a frame — so
+  point back at slide 19 instead of showing them twice.
+  1 — the panel is this deck's own commit history, which is a few dozen
+      points: the right size for a slide and the wrong size for the claim.
+      So press the button. That opens the components package's own charts
+      example in ITS OWN window: a million-point series, a streaming section
+      appending 60 points a second, small multiples at 90px, and a HUD under
+      each chart printing what the last frame cost — mode, span, command
+      count, wire bytes. Zoom in and out of the million and read the byte
+      count out loud: it does not move. Cost follows pixels, not points.
+      Scroll a chart out of view and its frame counter freezes.
+  2 — the flood. Say that the output is correct either way and the only
+      question is how many frames you spent on it.
+  Stop both before moving on.
 ---
 
-# 3,000 points, decimated to the pixels you can see
+# Don't draw detail nobody can see
 
-<Charts height={380} revealAt={0} />
+<Charts height={260} revealAt={0} />
+
+<ChartsDemo />
 
 ^^^
 
-# A terminal, flooded
+# Don't draw too often
 
 <Terminal
   height={380}
   command={["bash", "-lc", "yes 'the wire carries drawing, not pixels' | head -20000"]}
-/>
-
-^^^
-
-# A canvas that pans and zooms
-
-<Placeholder
-  name="flow"
-  height={380}
-  note="pan/zoom over a subtree scale — see components #63"
-/>
-
-^^^
-
-# And geometry, in a server-side display list
-
-<Placeholder
-  name="three"
-  height={380}
-  note="glarea over indirect GLX — one CallList per frame"
 />

@@ -2,39 +2,48 @@
 title: What a desktop toolkit is
 notes: |
   This slide earns the title of the talk. The spine: none of these are
-  features you implement, they are protocols and conventions you have to
-  SPEAK. That is the difference between drawing a UI and shipping one.
-  The global menu is the example to spend time on — same JSX, and the menu
-  either draws itself or leaves and appears in the desktop's own panel.
-  3 min including the D-Bus beat.
+  features you implement, they are protocols you have to SPEAK. That is the
+  difference between drawing a UI and shipping an application.
+  Step 2 is the slide. Read three or four rows ACROSS — the left column is
+  what a user would say they expect, the right column is the actual work.
+  The bullet list that used to be here said the same things as the left
+  column, so it is gone; say them while the table is up instead.
+  If anyone doubts the list is real: every row is a file in react-x11.
+  dnd.js, dbusmenu.js + globalmenu.js, atspi.js + a11y.js, portal.js,
+  appearance.js, trayhooks.js — plus idle.js (slide 13's live one),
+  activate.js, clipboard.js,
+  scale.js, compose.js, decorations.js, and a parallel set under cocoa/.
+  Slide 16 pays this list off as default arguments. 3 min.
 ---
 
 # Drawing rectangles is the easy 20%
 
-A toolkit is what makes an application belong to the desktop it is running
-on. Almost none of that is drawing.
+A toolkit is what makes an application **belong to the desktop it is running
+on**. Almost none of belonging is drawing.
 
 ^^^
 
-- **Integration** — drag and drop with other apps, the global menu, file and
-  print dialogs, permission prompts
-- **Native look & feel** — the desktop's colour scheme, light/dark, reduced
-  motion, increased contrast
-- **Accessibility** — screen readers, magnifiers, alternative input methods
-- **i18n / l10n** — the system's language, locale, date and number formats
-- **Activation** — `myapp://` links launching, or focusing, the running app
-- **Distribution** — packaging and updates
+Everything you expect from a real desktop app and never think about is a
+**protocol you have to speak**, not a feature you implement:
+
+| what the user sees | what you actually speak |
+| --- | --- |
+| drag and drop between apps | XDND — properties and client messages |
+| the menu in the desktop's panel | `com.canonical.dbusmenu`, over D-Bus |
+| a screen reader reading your app | AT-SPI, over D-Bus |
+| the file dialog, the permission prompt | XDG desktop portals, over D-Bus |
+| going dark when the desktop does | a D-Bus settings read, X resources as fallback |
+| another app's icon in your tray | XEmbed, and `_NET_SYSTEM_TRAY_*` |
 
 ^^^
 
-Every one of those is a **protocol you have to speak**, not a feature you
-implement. That is the actual work.
+Belonging to a desktop means being fluent in about a dozen conversations.
+**None of them involve a pixel.**
 
 ^^^
 
-> `<MenuBar menus={…}/>` hands its menu to the desktop's panel over
-> `com.canonical.dbusmenu` where one exists, and draws the bar itself where
-> none does.
+> `<MenuBar menus={…}/>` hands its menu to the panel over dbusmenu where one
+> exists, and draws the bar itself where none does.
 
-Same line of JSX either way — because the array that draws the menu is the
-array that serialises.
+Same line either way, because **the array that draws the menu is the array
+that serialises.** One data structure, two ports.

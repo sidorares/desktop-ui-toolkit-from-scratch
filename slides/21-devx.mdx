@@ -1,38 +1,44 @@
 ---
 title: Your tooling still works
 notes: |
-  THE APPLAUSE SLIDE. Don't rush it — this is where "clever hack" becomes
-  "I could actually use this".
-  If the room is warm, do it live: alt-click a slide and let your editor
-  jump to the JSX that drew it. Have the editor already open on a second
-  desktop. If anything is flaky, just describe it — the list alone lands.
+  SECTION OPENER for the two demo slides after it — deliberately short now.
+  It used to list DevTools and Fast Refresh, which slides 22 and 23 then
+  demonstrated; saying a thing and then showing it is right, but saying it
+  twice and then showing it is not. So this slide is the WHY, and they are
+  the WHAT.
+  Alt-click-to-source is the one thing here with no demo of its own, so it
+  keeps its step. If the room is warm, do it live — have the editor open on
+  a second desktop. If it is flaky, describe it; the line lands either way.
 ---
 
-# React DevTools. On an X11 window.
+# Your tooling still works
 
 ^^^
 
-- The component tree, props and hook state, **live** — and editing them
-  re-renders the app
-- The crosshair picks an element by clicking it **in the window**
-- "Highlight updates" outlines the rects that just re-rendered
-- The Profiler records the mount
+And the reason is the same one as everything else in this talk: **the tools
+speak protocols too.**
+
+- React DevTools does not know about the DOM. It talks to a backend over a
+  socket — which is how React Native does it
+- Fast Refresh needs a module boundary and a re-render, neither of which is a
+  browser thing
+- The JSX source location babel already puts on every element is just… there
+
+So a renderer with no DOM does not *implement* any of that. It **qualifies**
+for it.
 
 ^^^
 
-**Fast Refresh**, too. Save a file and the edited components update in
-place — the X11 connection, the window, and component state all survive.
-Half-typed text in an input is still there.
-
-^^^
-
-And **alt-click any element to open the JSX line that drew it**.
+Which includes one thing that was not free, and is my favourite:
+**alt-click any element on screen and your editor opens on the JSX line that
+drew it.**
 
 ```
 REACT_X11_EDITOR=code npm start
 ```
 
+A hit test, the source location, and spawning `$EDITOR`. About fifty lines.
+
 ^^^
 
-None of that is bespoke. It is React's own tooling, talking to a renderer
-that happens to draw on a display server.
+The next two slides are the other two, running.

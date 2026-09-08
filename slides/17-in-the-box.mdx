@@ -1,43 +1,52 @@
 ---
 title: What you actually write
 notes: |
-  The "is this a toy?" slide. Answer it with vocabulary, not adjectives.
-  Land the CSS-shaped bits — pseudo states and container queries — because
-  that is the moment a web developer stops translating and starts reading.
-  CUT CANDIDATE if you are running long: the next slide is the one that
-  gets the reaction.
+  The "is this a toy?" slide, and the narration's fix: lead with the GOAL,
+  then what the architecture FORCED, then admit the cost. A feature list
+  invites "so it's a CSS clone"; "there is no cascade, and this is what falls
+  out of that" does not.
+  Land the container-query inversion — in a desktop app the interesting size
+  is the pane, never the screen. That is the opposite of the web's history
+  and it is where a web developer stops translating.
+  The vocabulary list that used to close this slide is gone: slide 19
+  demonstrates the whole component set across seven steps, and listing it in
+  prose two slides earlier was saying it twice. Point forward instead.
 ---
 
 # It reads like the web, because it should
 
 ```jsx
-<box
-  style={{
-    flexDirection: 'row',
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: '$surface',
-    transition: 150,
-    ':hover': { backgroundColor: '$surfaceHover' },
-    '@container width >= 400': { flexDirection: 'column' },
-  }}
->
-  <text style={{ fontSize: 14 }}>Hello</text>
-</box>
+<box style={{
+  padding: 12,
+  backgroundColor: '$surface',
+  transition: 150,
+  ':hover': { backgroundColor: '$surfaceHover' },
+  '@container width >= 400': { flexDirection: 'column' },
+}}>
 ```
 
-^^^
-
-- Inline styles with **pseudo states** — `:hover`, `:focus`, `:active`,
-  `:disabled`, and `:drag-over` / `:dragging` for free
-- **Container queries**, including named containers, and window-size queries
-- Theme tokens (`$surface`) with **transitions** on any number or colour
+The goal was one sentence: **a web developer should be able to read this
+without translating.**
 
 ^^^
 
-On top of `<window>`, `<popup>`, `<box>`, `<text>`, `<textinput>`,
-`<image>`, `<canvas>`, `<svg>` and `<glarea>`: buttons, selects, sliders,
-menus, dialogs, tabs, trees, split panes — and a components package with
-charts, tables, terminals, maps and a markdown renderer.
+But there is no stylesheet here and no cascade — a style is an object on a
+node. So the architecture forced all of this:
 
-**This slide is being drawn by three of them.**
+- **Pseudo-states live in the object**, because there is no selector to put
+  them in — and `:drag-over` / `:dragging` come free
+- **Container queries, not media queries.** The interesting size in a desktop
+  app is the pane, never the screen — so the container query is the primitive
+  and the window query is the special case. The opposite of the web's history
+- **Tokens, not variables.** `$surface` resolves against the theme, which came
+  from the desktop over the bus `createRoot` opened
+- **Transitions on any number or colour**, because animation belongs to the
+  value, not to a rule somewhere else
+
+^^^
+
+What you give up is real: no cascade, no selectors, no stylesheet you can ship
+separately.
+
+What you get is that **every style is a value in the tree** — which is why the
+whole thing can be diffed, and why a theme change is just a re-render.

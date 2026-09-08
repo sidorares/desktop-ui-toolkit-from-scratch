@@ -19,6 +19,7 @@ import type { FenceInfo } from '@react-x11/components';
 import {
   Booking,
   Charts,
+  ChartsDemo,
   DataViz,
   DevTools,
   Ecosystem,
@@ -42,6 +43,7 @@ import { STATS } from './data.js';
 const COMPONENTS = {
   Booking,
   Charts,
+  ChartsDemo,
   DataViz,
   DevTools,
   Ecosystem,

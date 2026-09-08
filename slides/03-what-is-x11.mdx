@@ -1,25 +1,42 @@
 ---
 title: What X11 actually is
 notes: |
-  The single most important idea in the talk. Take your time.
-  X11 is a *protocol*, not a library. The client sends drawing commands;
-  the server owns the pixels. That's why a UI toolkit can be pure JS.
+  The single most important idea in the talk. Take your time — the two
+  consequences are separate steps because they are separate arguments, and
+  the whole rest of the deck hangs off them.
+  Consequence 1 is why a UI toolkit can be pure JS at all.
+  Consequence 2 is why a third of this talk is about round trips. The 1987
+  detail is not colour: it is the reason the protocol is asynchronous and
+  the reason a reply is something you learn to avoid asking for.
 ---
 
 # X11 is a protocol, not a library
 
-A byte stream over a socket. Requests go one way, events and replies come
-back.
+Not something you link against. A **byte stream over a socket**. Your program
+is the client; something else owns the screen, the pixels and the memory the
+window lives in.
+
+You send it requests — `CreateWindow`, `MapWindow`, `PolyFillRectangle`,
+`RenderCompositeGlyphs`. It sends back events and replies.
 
 ^^^
 
-- `CreateWindow`, `MapWindow`, `PolyFillRectangle`, `RenderCompositeGlyphs`
-- The **server** owns the pixels; the client owns the *description*
-- Latency is a first-class design constraint — it always was
+**First: the wire carries drawing, not pixels.**
+
+You do not hand the server a framebuffer, you hand it a *description* — a
+rectangle here, this colour; this glyph, at this position.
+
+> So anything that can write bytes to a socket can be a GUI toolkit.
+> That includes Node, with no bindings at all.
 
 ^^^
 
-> If the wire carries drawing rather than pixels, then anything that can
-> write bytes to a socket can be a GUI toolkit.
+**Second: there is a network in the middle.**
 
-That includes Node.
+Even over a Unix socket on this machine, the *shape* of the thing is a
+network — because it was designed in 1987 to put a window from a mainframe
+onto a terminal across a campus.
+
+That decision is why the protocol is asynchronous, why a reply is something
+you learn to avoid asking for, and why a third of this talk is about round
+trips.

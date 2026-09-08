@@ -1,10 +1,15 @@
 ---
 title: One update, end to end
 notes: |
-  Walk it left to right, once, slowly. The two things to land:
-  (1) layout is yoga, not the server; (2) only damaged regions are sent.
-  TODO: replace the ASCII with a drawn diagram — a `demo: pipeline` that
-  animates a state change travelling through the stages.
+  Walk it top to bottom, once, slowly. Say "discardable" out loud on the
+  reconcile stage and let it sit — the next slide is a bug that exists only
+  because of that word.
+  The two things to land are both about the socket: layout never leaves the
+  process, and paint sends the smallest rectangle that changed. Give the
+  REASON for the first one — a round trip per string measurement — because
+  "we use yoga" is a fact and "asking the server how wide a string is would
+  cost a round trip per text node per frame" is an argument.
+  TODO: a drawn diagram that animates a state change travelling the stages.
 ---
 
 # What happens when state changes
@@ -13,7 +18,7 @@ notes: |
   setState
      │
      ▼
-  reconcile ─────── render phase: pure, discardable
+  reconcile ─────── render phase: pure, and discardable
      │
      ▼
   commit ────────── host mutations: create, append, update
@@ -30,5 +35,14 @@ notes: |
 
 ^^^
 
-Two of those stages are the whole performance story: **layout never leaves
-the process**, and **paint sends the smallest rectangle that changed**.
+Two of those stages are the whole performance story, and both are about the
+socket.
+
+**Layout never leaves the process.** If you asked the server "how wide is this
+string" for every text node every frame, that is a round trip per
+measurement — and a round trip is the most expensive thing available to you.
+So font metrics come across once and get cached, and everything after that is
+arithmetic on this side of the wire.
+
+**Paint sends the smallest rectangle that changed.** A cursor blink in a
+terminal is one cell, not one screen.

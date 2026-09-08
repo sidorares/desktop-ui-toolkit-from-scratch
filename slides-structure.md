@@ -2,7 +2,7 @@
 
 Companion to [narration.md](narration.md), which is the spoken script.
 
-**38 slides, 124 steps, 40-minute slot.** This file was a proposal against a
+**37 slides, 121 steps, 40-minute slot.** This file was a proposal against a
 24-slide deck; PRs #1 and #2 then landed eight demo slides, so most of the
 original reordering argument is obsolete and has been dropped rather than
 forced onto a deck that had already moved. What survived, what was added, and
@@ -50,6 +50,23 @@ and it is worth a sentence on stage.
 | 15 | **What `createRoot()` did first** | the payoff for slide 11's list: three protocol clients started before your first render, and `{ desktop: false }` to prove the list is engineering rather than a brochure |
 | 23 | **The ecosystem** | `<Flow>` over the real dependency graph — see below |
 | 33 | **Eleven quiet years** | the chart, split back off the timeline (see below) |
+
+## Slides rewritten from the narration
+
+The prose, not the order. Each of these led with an example and now leads with
+the argument:
+
+| # | slide | what changed |
+| --- | --- | --- |
+| 03 | X11 is a protocol | the two consequences are separate steps, because they are separate arguments; 1987-across-a-campus is now the *reason* the protocol is asynchronous rather than colour |
+| 04 | node-x11 | ends on *"opening a window is not a toolkit. So what is?"* — the hinge into slide 12 |
+| 12 | the easy 20% | the see/speak table: six desirable properties became a right-hand column of actual protocols. The notes carry the module names, so the list is answerable rather than assertable |
+| 14 | React needs a host | *"the reconciler is a protocol too"*, and the DOM's silent work moved here from the layers slide |
+| 17 | it reads like the web | **the biggest rewrite.** Was a JSX blob plus a vocabulary list; now the design goal, then what the architecture *forced* (no cascade → pseudo-states in the object; panes not screens → container queries are the primitive), then what it costs |
+| 21 | your tooling still works | **was duplicating slides 22 and 23.** It listed DevTools and Fast Refresh, which the next two slides then demonstrated. Now it is the *why* — the tools speak protocols, so a renderer qualifies rather than implements — plus alt-click-to-source, the one thing with no demo of its own |
+| 25 | the pipeline | *why* layout is client-side (a round trip per string measurement) rather than the bare fact that it uses yoga |
+| 30 | every optimisation was "don't" | four refusals, **one per budget**, which is what makes them a set rather than a list of tips — and the setup slide for 31 |
+| 31 | the demos | retitled *"Two of the four, running"*, placeholders gone, charts launcher added |
 
 Slides 04–06 sit **before** the visualizer and the three `<Wire>` demos, so
 every concept is spoken before it is watched on the wire. That is the one idea
@@ -108,21 +125,48 @@ The thing to cut was the grid, not the chart.
 slide. Worth keeping in `src/data.ts` as the answer to a question from the
 floor, but they should not go back on screen.
 
+## Placeholders and the joke — all resolved
+
+**Zero `<Placeholder>` left on any slide**, and `scripts/smoke.ts` now exits
+non-zero if one comes back.
+
+- The **joke slide is gone**. It was the one slide whose content was a
+  screenshot nobody had taken, and it was the second-to-last thing the room
+  would see.
+- The perf demo slide's two placeholders were **already covered**. Slide 19
+  step 5 is `<Flow>` panning and zooming over a subtree scale, and step 7 is
+  the GL scene on `<glarea>` — which is one `CallList` a frame. Those are
+  exactly "don't redraw what did not move" and "don't send it twice", already
+  demonstrated with better demos than the placeholders described. So slide 31
+  runs **two** of the four refusals and points back at 19 for the others.
+- `<Placeholder>` the component stays. It is genuinely useful while writing;
+  the smoke guard is what stops it shipping.
+
+## The charts launcher — slide 31
+
+The panel on that slide draws this deck's commit history: a few dozen points,
+the right size for a slide and the wrong size for the claim. "Cost follows
+pixels, not points" is only interesting at a scale a slide cannot hold, and
+only *believable* with a frame counter and a byte count beside it.
+
+So the button starts `@react-x11/components`' own `examples/charts.tsx` —
+copied in, import repointed at the published package — **in its own window**:
+a million-point series through per-column min/max spans, a streaming section
+appending sixty points a second, small multiples at 90px, and a HUD under each
+chart printing the last frame's mode, span, command count and estimated wire
+bytes. Zoom the million and the byte count does not move.
+
+Separate process for two reasons: it needs its own connection and frame clock
+or the HUD reports *this deck's* frames, and a demo that can wedge itself on a
+million points should not be able to take the talk down with it.
+
 ## Still open
 
-1. **Two `<Placeholder>`s remain** — slide 30 step 3 and slide 35 (the joke
-   screenshot). `<Flow>` and `<Canvas>`/three both exist in components 0.7.0,
-   so slide 30's placeholder is now only a wrapper away; the joke one is a
-   missing PNG, and it is the second-to-last thing the audience sees.
-2. **Suggested guard rail:** make `scripts/smoke.ts` fail if any slide still
-   names `<Placeholder>`. It already parses every slide and reports its
-   components, so this is a few lines, and it turns "did I finish the demos"
-   into a pre-flight check.
-3. **`<Metric>` is still used by no slide.** If any single number goes back on
+1. **`<Metric>` is used by no slide.** If any single number goes back on
    screen, that is what it is for.
-4. **Act markers.** Seven acts across 38 slides is a lot to hold without
+2. **Act markers.** Seven acts across 37 slides is a lot to hold without
    signposting; cheapest is the act name in the existing footer beside the step
    counter.
-5. **Timing.** 38 slides in 40 minutes is tight even speed-running 04–06.
-   The cut ladder: slide 27 (four budgets) folds into 07; slide 26 (the loop)
-   folds into 34; two of slide 30's four demos are eye candy.
+3. **Timing.** 37 slides in 40 minutes is tight even speed-running 04–06.
+   The cut ladder: slide 28 (four budgets) folds into 08; slide 27 (the loop)
+   folds into 34.
