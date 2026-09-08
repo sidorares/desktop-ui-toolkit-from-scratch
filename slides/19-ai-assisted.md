@@ -1,0 +1,35 @@
+---
+title: The honest version
+notes: |
+  The room will be split on this — some are all-in, some are tired of the
+  hype. Don't sell. Say what actually changed and what didn't, and let the
+  47 days speak for themselves.
+  If you only land one line, land the PRD one: the design record became the
+  unit of work, and that is a real change in how the code is shaped.
+---
+
+# So: AI-assisted development
+
+The loop did not change. The **cycle time** did.
+
+^^^
+
+What changed:
+
+- The design record became the unit of work — a PRD per component, written
+  before the code and kept after it
+- Reading and reviewing became the bottleneck, not typing
+- "Try it as a throwaway" got cheap enough to do first, every time
+
+^^^
+
+What did not:
+
+- Deciding **what** to build, and what to refuse to build
+- Protocol-level debugging — a wrong byte is still a wrong byte
+- Taste. Every API on the previous twelve slides is a judgement call
+
+^^^
+
+> The 47 days are not "AI wrote a toolkit". They are fifteen years of
+> knowing exactly what I wanted, finally meeting a fast enough typist.

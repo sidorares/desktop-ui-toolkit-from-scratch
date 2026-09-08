@@ -1,0 +1,31 @@
+---
+title: This is the talk, running
+notes: |
+  THE HOOK. Don't explain anything yet. Show, then land the line.
+  Beat 1: this slide deck is an X11 client.
+  Beat 2: a real terminal, on the slide, in-process VT.
+  Beat 3: "no browser, no Electron, no compiled UI module."
+  Budget 3 min. If a demo misbehaves, move on — the deck itself is the demo.
+---
+
+# You are looking at the demo
+
+This deck is not a slide deck. It is an X11 application: a `<window>`, a
+flex layout, shaped text, and a markdown renderer.
+
+^^^
+
+Everything on this slide is drawn by the toolkit the talk is about —
+including a **real shell**, running right here:
+
+```demo
+name: terminal
+height: 300
+command: bash -l
+```
+
+^^^
+
+No browser. No Electron. No compiled UI module.
+
+**One `node` process, talking to a display server.**
