@@ -9,30 +9,13 @@ components; the terminal on slide 2 is a real shell.
 ## Running it
 
 ```bash
-npm install --install-links
+npm install
 npm start
 ```
 
-`--install-links` matters: `@react-x11/components` is a `file:` dependency on
-the sibling checkout, and a symlinked one resolves its own copy of React —
-two Reacts in one process is an "Invalid hook call". Installing it as a copy
-lets React hoist.
-
-**Until `@react-x11/components@0.5.0` is published**, this deck needs the
-sibling checkout *built*, and needs it for a real reason: the published
-0.4.0 dereferences a laid-out run's span without a guard, which crashes on
-the first painted paragraph on macOS. Master has the fix (PR #58); `dist/` is
-gitignored, so it has to be built locally:
-
-```bash
-npm --prefix ../react-x11-components run build
-```
-
-When 0.5.0 ships, this all collapses back to `"@react-x11/components": "^0.5.0"`
-and a plain `npm install`.
-
-On macOS this runs on react-x11's native Cocoa backend. To present under
-XQuartz instead — see [Fidelity](#fidelity) — use:
+On macOS this runs on react-x11's native Cocoa backend, which is the one to
+present on. XQuartz is available as an alternative — see
+[Fidelity](#fidelity) — and is worth knowing about but not worth arranging:
 
 ```bash
 npm run x11
@@ -140,10 +123,19 @@ below. It is also the seed of the backup PDF, which a talk should have.
 `<Markdown>` paints inline-code chips, link underlines and strikethrough
 rules by reading the *span* each laid-out run came from. react-x11's Cocoa
 text engine reports run geometry only, so on macOS those decorations are
-skipped — the text is correct, the chips are missing
-(`react-x11` Cocoa gap 2; the fix belongs in `cocoa/fonts.js` `layout()`).
+skipped (`react-x11` Cocoa gap 2; the fix belongs in `cocoa/fonts.js`
+`layout()`, attaching `span`/`run` per native run by code-unit range).
 
-Until that lands, `npm run x11` under XQuartz is the full-fidelity path.
+**In practice this is cosmetic.** What is lost is the rounded chip *behind*
+inline code and the rule under a link. What survives is everything that
+comes from the span's own attributes, because those go into the native
+layout: the monospace face, weight, size and colour. Inline code still
+reads as code; fenced blocks are unaffected, since their background is a
+box and their highlighting is per-token colour. At projector size nobody
+has noticed.
+
+So `npm run x11` under XQuartz is the pixel-exact path, not the usable one.
+Present on Cocoa.
 
 ## Structure
 
