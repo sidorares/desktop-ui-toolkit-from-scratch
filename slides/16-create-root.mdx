@@ -1,0 +1,43 @@
+---
+title: What createRoot() did first
+notes: |
+  The payoff for Act I's list of protocols, and the reason it is a separate
+  slide: `await createRoot()` is one line, and by the time your first
+  component renders it has already dialled the session bus and started three
+  clients.
+  Land the second beat hardest — you can turn it OFF. That is how you know
+  the list is engineering rather than a brochure, and the reasons are real:
+  a kiosk, a daemon, a test that needs the same answer on every machine.
+  Callback: this is where the appearance that themes every slide comes from.
+---
+
+# One line had already done this
+
+`await createRoot()` connected to the display, loaded the layout engine —
+and dialled the session bus to start **three protocol clients**, before your
+first component rendered:
+
+| | |
+| --- | --- |
+| `appearance` | the desktop's light/dark, accent, contrast, reduced motion |
+| `a11y` | the AT-SPI bridge — whether a screen reader can see this app |
+| `globalMenu` | whether a `MenuBar` hands its menu to the panel, or draws it |
+
+^^^
+
+And here is how you know that list is engineering and not a brochure:
+**you can turn it off.**
+
+```js
+await createRoot({ desktop: false });                  // none of it
+await createRoot({ desktop: { appearance: false } });  // just that one
+```
+
+For a kiosk. A daemon. A test that needs the same answer on every machine.
+An embedder that owns those integrations itself and does not want a second
+app fighting it for the bus.
+
+^^^
+
+> Act I's dozen conversations, arriving as the default arguments of a
+> constructor.

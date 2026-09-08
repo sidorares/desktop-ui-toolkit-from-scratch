@@ -1,0 +1,44 @@
+---
+title: What a window actually is
+notes: |
+  Speed-run, but do not skip the last step — it is the one that connects to
+  the roadblock slide and to Cocoa.
+  A window is three things and no more: a rectangle in a tree, a surface you
+  may draw on, and a thing that sends events back. There are no widgets in
+  X11. A button is a rectangle plus your own code.
+  Then: this is why react-x11 uses ONE window and paints the rest.
+---
+
+# A window is a rectangle with three jobs
+
+There are no widgets in X11. No buttons, no text fields, no menus. There is
+one object, and everything else is convention on top of it.
+
+^^^
+
+- **A rectangle in a tree.** Position is relative to its parent, and the
+  parent clips it. That is the entire layout model the server offers.
+- **A paint surface.** It is a *drawable*: you may aim drawing requests at
+  it, and the server keeps the pixels.
+- **An event source.** A 32-bit mask says which events you want — clicks,
+  motion, keys, exposure, geometry changes — and they arrive unrequested.
+
+^^^
+
+That is the whole object. A button is a rectangle that accepts drawing,
+receives clicks, and has somebody's code deciding what it looks like in
+between.
+
+^^^
+
+Which is why react-x11 makes **one** window and paints everything into it.
+
+A window per `<box>` would be thousands of pieces of server-side state, a
+round trip's worth of setup each, and a hit-test the server does instead of
+you — slower *and* less controllable. The tree you write is a tree in this
+process; only a real top-level `<window>` is a real X11 window.
+
+^^^
+
+> The server's job is the rectangle. Everything you think of as a user
+> interface happens on this side of the socket.

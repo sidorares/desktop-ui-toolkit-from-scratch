@@ -1,0 +1,47 @@
+---
+title: Ids you invent yourself
+notes: |
+  Speed-run slide, but this is the one that explains why the protocol feels
+  fast. The handshake hands over a *range*; the client mints ids out of it
+  locally. So a name for a thing costs no round trip, and you can use the
+  name in the very next request — before the server has read the one that
+  creates it.
+  Land the word "future": the id is a handle to a thing that does not exist
+  yet, and the whole pipeline depends on that being legal.
+  Pays off on the window demo, where AllocID is a local counter.
+---
+
+# Every id is a promise you make yourself
+
+The connection handshake does not just say hello. The server hands back a
+**range of resource ids** — a base and a mask — and from then on the client
+mints its own.
+
+^^^
+
+```js
+const wid = display.client.AllocID();   // a local counter. No request.
+display.client.CreateWindow(wid, root, 0, 0, 400, 300);
+display.client.MapWindow(wid);          // uses it immediately
+```
+
+^^^
+
+So `wid` is a **future**: a handle to a window that does not exist yet, and
+will not exist until the server gets around to reading the request three
+lines up.
+
+That is legal, and it is the whole trick. You can name a thing and use the
+name in the same breath, because both of you already agree who gets to
+invent names.
+
+^^^
+
+The alternative is the obvious design — *ask* the server to create a window
+and reply with its id — and it costs a **round trip per object**. Every
+window, pixmap, graphics context, font and glyph set.
+
+^^^
+
+> A protocol built in 1987 for a network could not afford to ask permission
+> for names. So it gave the names away at the door.

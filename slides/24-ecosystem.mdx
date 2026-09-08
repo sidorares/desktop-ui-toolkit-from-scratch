@@ -1,0 +1,27 @@
+---
+layout: full
+title: The ecosystem
+notes: |
+  Drag a node if the room is warm — it is a real graph, not a picture.
+  Beat 1: the spine. Workbench on top, a socket at the bottom, and an arrow
+  means "depends on". The two dashed headless edges are not dependencies:
+  the visualizer sits ON the wire when DISPLAY points at it, and
+  react-devtools is joined by a websocket and nothing else.
+  Worth saying out loud, since it is not drawn: the visualizer's own UI is a
+  react-x11 app. It is a client of the thing it is debugging.
+  Beat 2: everything JavaScript steps back, and three nodes stay lit — and
+  the differences between those three are the whole point. Yoga is amber:
+  compiled, but shipped as inlined WASM, so no toolchain and no node-gyp.
+  x11-dri is optional and only for GL. AppKit is the one that actually broke
+  the rule, and it bought macOS.
+  This is the setup for the Cocoa slide. 90 seconds.
+---
+
+<Ecosystem revealAt={1} />
+
+^^^
+
+Three nodes there are not JavaScript. One ships as inlined WASM and needs no
+toolchain. One is optional, for OpenGL.
+
+**And one is the reason this talk has a slide about macOS.**
