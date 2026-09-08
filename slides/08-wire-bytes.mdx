@@ -1,0 +1,22 @@
+---
+title: What a request looks like
+notes: |
+  DEMO — 90 seconds, and the one to linger on. Run it, then select
+  ChangeProperty in x11vis and click the `name` field: the bytes light up in
+  the hex dump. Show the pad byte.
+  Then select GetGeometry and follow the link to its reply — same sequence
+  number. That is the whole request/reply/sequence story in one click.
+  This sets up the "layout never leaves the process" slide later: every one
+  of these is a round trip you would rather not make.
+---
+
+# Three shapes, and every byte accounted for
+
+<Wire example="title" />
+
+^^^
+
+A **value list** — a mask, then one 32-bit value per bit, in mask order. A
+**string** — 8-bit units, padded up to a multiple of four, with a length
+that counts the characters and not the padding. And the one request that
+asks a question, whose reply carries its **sequence number**.

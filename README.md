@@ -4,8 +4,8 @@ A talk for MelbJS about [react-x11](https://github.com/sidorares/react-x11) —
 presented in an app built with react-x11.
 
 The deck is an X11 client. The slides are markdown; the demos are live
-components; the terminal on slide 2 is a real shell, slide 10 is the
-component library demonstrating itself, and slide 11 reads the calendar the
+components; the terminal on slide 2 is a real shell, slide 14 is the
+component library demonstrating itself, and slide 15 reads the calendar the
 desktop already has.
 
 ## Running it
@@ -177,6 +177,10 @@ shell one-liner keep its quotes and its pipe.
 | `<Stats>` | the four totals, in a row |
 | `<Metric>` | one number, said loudly |
 | `<Terminal>` | a real shell, on the in-process vt backend |
+| `<HtmlPlayground>` | `<CodeEditor>` and `<Html>`, split — type markup, see it rendered |
+| `<Wire>` | a node-x11 example, and a button that runs it through x11vis |
+| `<DevTools>` | starts React DevTools, then an app with the bridge on |
+| `<HotReload>` | starts an app under the refresh loader, and edits its source |
 | `<Placeholder>` | a box the size a demo will be, for one that isn't built |
 | `<Widgets>` | core's controls, a variable font's axes and an `<svg>`, on one wire |
 | `<Documents>` | markdown, maths and HTML behind one strip of `<Tabs>` |
@@ -185,8 +189,8 @@ shell one-liner keep its quotes and its pipe.
 | `<SourceCode>` | a file off disk, highlighted — the demo's own, usually |
 | `<Booking>` | a flight booking that reads the desktop's calendar |
 
-`<DataViz>` and `<Scenes>` are five of slide 10's seven steps, one `panel`
-each; `<Booking>` is slide 11. Between them the showcase is every component
+`<DataViz>` and `<Scenes>` are five of slide 14's seven steps, one `panel`
+each; `<Booking>` is slide 15. Between them the showcase is every component
 this talk claims: `<box>`, `<text>`, `<textinput>` and core's widgets;
 variable-font axes read off the font file; `<svg>`; `<Markdown>`, `<Formula>`
 and `<Html>`; `<Tabs>`; charts, the timeline, the flow pane with three nodes
@@ -220,10 +224,62 @@ slides and get asked about afterwards. Passing `scope` is safe here only
 because these slides are ours; the same prop pointed at a document somebody
 else wrote would be handing it `new Function`.
 
+## Demos that start other programs
+
+Four slides run something that is not the deck: the DevTools pair (slide 17),
+the hot-reload example (18), and the three protocol slides (6–8). Each has a
+button, and beside the button are the commands it runs — the button is the
+convenience, the commands are the point, and a demo whose button does not
+work is still a slide you can talk from.
+
+They all behave the same way. The children are spawned **detached, in their
+own process group**, so stopping one stops what it started (`react-devtools`
+is a node script that spawns Electron as a child, and signalling the script
+alone would leave the window behind); closing the deck takes them with it.
+And because `<Prose>` is remounted on every keypress, the processes are held
+in a module-scope store rather than in component state — stepping away from a
+slide and back finds the demo still running.
+
+**React DevTools** (17) — `npm run devtools`, then `npm run example:devtools`. The
+button does both, in that order, because the backend connects to a socket
+that has to already be listening. The deck cannot inspect *itself*:
+`REACT_X11_DEVTOOLS` is read before React's first commit, so what opens is a
+second app, [`examples/devtools-demo.tsx`](examples/devtools-demo.tsx). The
+three packages it needs — `react-devtools`, `react-devtools-core`, `ws` — are
+devDependencies, so `npm install` has them; the first drags in Electron, which
+is most of the install. A DevTools already listening on 8097 is used as it
+stands rather than replaced.
+
+**Hot reload** (18) — `npm run example:hot`. The second button rewrites two marked
+lines in [`examples/hot-demo-app.jsx`](examples/hot-demo-app.jsx), which is a
+save like any other: the loader's watcher applies it, and the count and the
+half-typed text on screen do not move. The variants cycle and the third press
+restores the committed text, so a full cycle leaves the working tree clean —
+`git diff` if you have been rehearsing. The example is two files because a
+module is a refresh boundary only when *every* export of it is a component:
+the components are in `hot-demo-app.jsx`, and `hot-demo.jsx` does the
+mounting, which must not run twice. The toolchain — `@babel/core`,
+`@babel/plugin-transform-react-jsx`, `hot-module-replacement`, `react-refresh`
+— is react-x11's optional peers, carried here as devDependencies.
+
+**The wire** (6–8) — `DISPLAY=127.0.0.1:1 node examples/x11/window.js`, with
+[x11vis](https://github.com/sidorares/x11-protocol-visualizer) listening on
+6001. Two things are not in this repo. The visualizer is not published, so it
+is looked for rather than installed: `X11VIS` names it outright, else a
+`node_modules` install, else a sibling checkout beside this one (which is
+what a machine with all seven repositories looks like). And the proxy
+forwards to a **real X server**, so `$DISPLAY` has to point at one — XQuartz,
+on a mac. Without either, the panel says which is missing instead of failing
+quietly. `X11VIS_PORT` moves the port; one already listening is reused, and
+left alone by Stop, so a visualizer you started by hand stays yours.
+
+Rehearse each of them once on the machine you are presenting from, on the
+wifi you will have. That is the whole of the advice.
+
 ## The workbench
 
 The components are developed in [`@react-x11/workbench`](https://github.com/sidorares/react-x11-workbench),
-not by re-running the deck and arrowing to slide 21:
+not by re-running the deck and arrowing to slide 27:
 
 ```bash
 npm run workbench      # bunx @react-x11/workbench dev
@@ -231,9 +287,10 @@ npx x11-workbench ls   # what it found
 ```
 
 Each component on its own, every variant at once, props editable while it
-runs. `stories/` has 54 stories across the thirteen — including both sides of
+runs. `stories/` has 68 stories across the seventeen — including both sides of
 every step reveal, which is the behaviour most likely to break quietly and
-least likely to be noticed until it breaks on stage.
+least likely to be noticed until it breaks on stage, and the states a
+launcher only reaches by failing.
 
 `workbench.config.ts` wraps every story in the deck's own palette
 ([`src/theme.ts`](src/theme.ts)), and that is not decoration. A story renders
@@ -269,6 +326,7 @@ Present on Cocoa.
 | --- | --- |
 | `slides/` | the talk, one `.mdx` file per slide |
 | `src/components/` | what a slide may name, and the workbench's subjects |
+| `examples/` | the apps the demo slides start, in their own processes |
 | `src/data.ts` | the talk's numbers, so they cannot disagree |
 | `stories/` | workbench stories for every component |
 | `scripts/smoke.ts` | every slide parsed, with its steps and its components |
@@ -277,6 +335,11 @@ Present on Cocoa.
 | `src/steps.tsx` | `useStep()`, `at()`, `<Step>` |
 | `src/zoom.tsx` | the zoom ladder, and what every length is multiplied by |
 | `src/prose.tsx` | `<Markdown>` with the deck's typography, components and scope |
+| `src/processes.ts` | spawning, stopping and watching a demo's child processes |
+| `src/devtools.ts` | the DevTools pair: the UI, the port, then the app |
+| `src/hotreload.ts` | the refresh-loader run, and the edit the slide makes |
+| `src/x11vis.ts` | finding the visualizer, and pointing an example at it |
+| `src/html-language.ts` | an HTML mode for `<CodeEditor>`, written for slide 13 |
 
 Anything here that turns out to be generally useful belongs in
 [`@react-x11/components`](https://github.com/sidorares/react-x11-components)

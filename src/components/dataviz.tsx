@@ -15,7 +15,7 @@
 // shown between them: it registers no element at all — it is `<box>` and
 // `<text>`, and the line down its gutter is one absolutely-positioned pixel.
 // This deck rolled its own before the package had one
-// (`src/components/timeline.tsx`, still what slide 21 uses); this is the one
+// (`src/components/timeline.tsx`, still what slide 27 uses); this is the one
 // that shipped.
 import type { ReactElement } from 'react';
 
@@ -49,7 +49,7 @@ const CONFIG = {
   commits: { label: 'commits', color: '$accent' },
 } satisfies ChartConfig;
 
-/** The same numbers as slide 22's bar chart — one dataset, another chart. */
+/** The same numbers as slide 28's bar chart — one dataset, another chart. */
 const SERIES = HISTORY.map((d) => ({ ...d }));
 
 const CHARTS_CAPTION = 'charts — one element, a million points is a normal input';

@@ -1,0 +1,19 @@
+---
+title: And the events coming back
+notes: |
+  DEMO — 60 seconds. Run it, then click the window: one event per click
+  appears in the list, coming the other way.
+  The point: the same conversation as the last slide plus one 32-bit field.
+  Nothing registered a listener over the wire.
+---
+
+# One bit more, and it answers back
+
+<Wire example="mousedown" />
+
+^^^
+
+`eventMask` is a 32-bit set inside the *same* `CreateWindow`. Asking for
+clicks costs four bytes and no extra request — and every click comes back as
+32 bytes the client never asked for, which is the half of the protocol that
+is not request/reply at all.

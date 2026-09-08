@@ -1,0 +1,21 @@
+---
+title: A window, and nothing else
+notes: |
+  DEMO — first of three, 90 seconds. Press Run and keep talking: x11vis
+  opens its window, then the example runs against it.
+  Point at the message list: a handshake, then four requests, and not one
+  reply. Read the AllocID line out loud — the id comes from a range the
+  server handed over at connect time, so naming a window costs no round trip.
+  NEEDS XQUARTZ, because the proxy forwards to a real server. If x11vis is
+  not on the machine the panel says so — talk through the code and move on.
+---
+
+# The smallest thing you can see
+
+<Wire example="window" />
+
+^^^
+
+A handshake, then **four requests, no replies**. `CreateWindow` and
+`MapWindow` are one-way: nothing here waits for the server, and the id in
+the first argument was invented by the client.
