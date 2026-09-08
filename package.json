@@ -10,17 +10,20 @@
   "scripts": {
     "start": "tsx src/main.tsx",
     "x11": "REACT_X11_BACKEND=x11 tsx src/main.tsx",
+    "workbench": "bunx @react-x11/workbench dev",
     "typecheck": "tsc --noEmit",
     "shot": "tsx scripts/shot.tsx",
     "render": "tsx scripts/render.tsx",
     "smoke": "tsx scripts/smoke.ts"
   },
   "dependencies": {
-    "@react-x11/components": "^0.5.0",
+    "@lydell/node-pty": "^1.1.0",
+    "@react-x11/components": "^0.6.0",
     "react": "^19.2.8",
     "react-x11": "^2.9.0"
   },
   "devDependencies": {
+    "@react-x11/workbench": "^0.2.0",
     "@types/node": "^26.2.0",
     "@types/pngjs": "^6.0.5",
     "@types/react": "^19.2.17",

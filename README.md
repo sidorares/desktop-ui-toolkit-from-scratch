@@ -31,18 +31,57 @@ npm run x11
 | `Page Up` `Page Down` | previous / next slide |
 | `Home` `End` | first / last slide |
 | `f` | toggle fullscreen (asks the window manager) |
-| `Esc` | leave fullscreen |
-| `r` | re-read `slides/` from disk |
+| `Esc` | hand the keyboard back to the deck, else leave fullscreen |
+| `r` | re-read `slides/` from disk (saves reload on their own) |
+| `⌘+` `⌘-` | **bigger** / **smaller** — `Ctrl` too, for a Linux desktop |
+| `⌘0` | back to 100% |
 
 Stepping back off the front of a slide lands on the **last** step of the one
 before it, so rehearsing backwards works.
+
+`slides/` is watched, so writing the talk is a save away from seeing it: the
+deck re-reads the directory and stays exactly where it was — same slide, same
+step, same zoom. Editing `src/` is a restart, since that is code; `npx tsx
+watch src/main.tsx` will do it for you, at the cost of a new window each
+time.
+
+**A demo that has the keyboard keeps it.** Click the terminal on slide 2 and
+you are typing into bash: `space` is a space, `f` is an `f`, and the deck
+does not move. `Esc` hands the keyboard back — so does clicking anywhere off
+the demo — and then the deck's keys are the deck's again. Zoom is the
+exception, because `⌘+` is an accelerator: those run *after* the focused
+element has had its refusal, so the room can be adjusted mid-demo.
+
+## Size
+
+How big the deck has to be is a fact about the room, learned about ten
+seconds before the talk starts, so it is a key. `⌘+` steps up a ladder of
+sizes — 80%, 90%, 100%, 115%, 130%, 150%, 175%, 200% — and the footer says
+where it is whenever that is not 100%. (`⌘=` is the same binding: `+` is a
+shifted `=` on most layouts, and both spellings are bound, on `⌘` *and*
+`Ctrl`.)
+
+**The window does not resize; the content reflows inside it.** That is the
+difference between this and the display scale react-x11 resolves per
+connection: turning *that* dial would be the app claiming the panel had
+changed, and the window would grow to cover more of the screen with not one
+line rewrapped. Here the window stays where the window manager put it, and a
+bullet that fitted on one line takes two.
+
+What scales is the type and the space around it — prose, headings, code, the
+chrome, and anything a demo draws that inherits its size, down to a chart's
+axis labels. What does **not** scale is the box a demo asked for: a
+`height: 380` is a share of a window that zoom does not resize, so growing it
+only pushes the slide's own chrome off the bottom edge. A terminal at 150% is
+the same pane with larger characters and fewer of them, which is what `⌘+`
+does to every other terminal on the machine.
 
 ## Writing a slide
 
 One file per slide in `slides/`, ordered by filename. Frontmatter is
 optional:
 
-```markdown
+```mdx
 ---
 title: What a desktop toolkit is
 notes: |
@@ -80,43 +119,64 @@ Other frontmatter keys: `title` (defaults to the first heading, then the
 filename), `notes`, and `layout` — `default`, `title` (vertically centred,
 larger type) or `full` (no padding, for a slide that is all demo).
 
-## Live demos
+## Components in a slide
 
-A ```` ```demo ```` fence renders a registered component instead of a code
-block:
+A slide names a component and gets one — `@react-x11/components` 0.6.0's
+MDX, on `<Markdown>`'s `components` prop:
 
-````markdown
-```demo
-name: terminal
-height: 300
-command: bash -l
+```mdx
+Everything on this slide is drawn by the toolkit the talk is about:
+
+<Terminal height={300} command={["bash", "-lc", "yes hello | head -20000"]} />
 ```
-````
 
-`name` selects from the registry in [`src/demos/index.tsx`](src/demos/index.tsx);
-every other key reaches the demo as a string. An unregistered name renders a
-labelled box of the right height, so a slide can be laid out and rehearsed
-before its demo exists.
+A tag is a component **iff its name is a key in the map**, which lives in
+[`src/prose.tsx`](src/prose.tsx). Anything else — `<Unclaimed />`, a stray
+`<` — is the literal text it looks like, so prose about `<box>` and `<text>`
+stays prose. Attributes are strings, `true`, or JSON, which is what lets a
+shell one-liner keep its quotes and its pipe.
 
-Demos read `useStep()` to find out where the slide has got to — which is how
-the chart on the stats slide shows eleven quiet years first and the spike
-second, from one component.
+| component | what it is |
+| --- | --- |
+| `<Charts>` | react-x11's commit history, drawn by react-x11 |
+| `<Timeline>` | the dates, as a shape rather than a list |
+| `<Stats>` | the four totals, in a row |
+| `<Metric>` | one number, said loudly |
+| `<Terminal>` | a real shell, on the in-process vt backend |
+| `<Placeholder>` | a box the size a demo will be, for one that isn't built |
 
-This works through `<Markdown>`'s existing `fences` seam — the same one that
-turns a ```` ```math ```` fence into a `<Formula>`. That is why the slides
-can stay plain CommonMark: the only thing a deck needs that markdown lacks
-is an escape into components, and the component already has one.
+Components read `useStep()`, so one of them can be both halves of a point:
+`<Charts revealAt={1} />` shows eleven quiet years, then rescales its axis
+under 2026 when the slide steps. `revealAt={0}` opts out.
 
-## Capturing slides
+Slides can also **compute**, because `prose.tsx` passes a `scope`:
+
+```mdx
+# 15 years, and then {stats.days} days
+
+react-x11 sat at **{stats.quietYears} commits** for eleven years.
+```
+
+Those come from [`src/data.ts`](src/data.ts), so the chart and the sentence
+beside it cannot disagree — which matters for numbers that appear on three
+slides and get asked about afterwards. Passing `scope` is safe here only
+because these slides are ours; the same prop pointed at a document somebody
+else wrote would be handing it `new Function`.
+
+## The workbench
+
+The components are developed in [`@react-x11/workbench`](https://github.com/sidorares/react-x11-workbench),
+not by re-running the deck and arrowing to slide 19:
 
 ```bash
-npm run render -- 17 1 stats.png   # headless, through ntk's text engine
-npm run shot   -- 17 1 stats.png   # the real window, via CGWindowListCreateImage
+npm run workbench      # bunx @react-x11/workbench dev
+npx x11-workbench ls   # what it found
 ```
 
-`render` needs no window server and goes through the engine that reports
-laid-out runs *with* their spans, so it shows a slide at full fidelity — see
-below. It is also the seed of the backup PDF, which a talk should have.
+Each component on its own, every variant at once, props editable while it
+runs. `stories/` has 23 stories across the six — including both sides of
+every step reveal, which is the behaviour most likely to break quietly and
+least likely to be noticed until it breaks on stage.
 
 ## Fidelity
 
@@ -141,13 +201,16 @@ Present on Cocoa.
 
 | | |
 | --- | --- |
-| `slides/` | the talk, one markdown file per slide |
-| `scripts/smoke.ts` | every slide parsed, with step and demo counts |
+| `slides/` | the talk, one `.mdx` file per slide |
+| `src/components/` | what a slide may name, and the workbench's subjects |
+| `src/data.ts` | the talk's numbers, so they cannot disagree |
+| `stories/` | workbench stories for every component |
+| `scripts/smoke.ts` | every slide parsed, with its steps and its components |
 | `src/deck.tsx` | window, key map, chrome |
 | `src/slides.ts` | frontmatter + reveal parsing |
 | `src/steps.tsx` | `useStep()`, `at()`, `<Step>` |
-| `src/prose.tsx` | `<Markdown>` with the deck's typography and fences |
-| `src/demos/` | the demo registry |
+| `src/zoom.tsx` | the zoom ladder, and what every length is multiplied by |
+| `src/prose.tsx` | `<Markdown>` with the deck's typography, components and scope |
 
 Anything here that turns out to be generally useful belongs in
 [`@react-x11/components`](https://github.com/sidorares/react-x11-components)

@@ -114,7 +114,7 @@ export function parseSlide(filename: string, text: string): Slide {
   const { meta, body } = parseFrontmatter(text);
   const reveal = isReveal(meta.reveal) ? meta.reveal : 'cumulative';
   const chunks = splitReveals(body, reveal);
-  const id = filename.replace(/\.md$/, '').replace(/^\d+[-_]?/, '');
+  const id = filename.replace(/\.mdx?$/, '').replace(/^\d+[-_]?/, '');
   return {
     id,
     // A slide with no `title:` takes its first `# heading`, and failing that
@@ -132,10 +132,10 @@ export function parseSlide(filename: string, text: string): Slide {
   };
 }
 
-/** Every `NN-name.md` in `dir`, in filename order. */
+/** Every `NN-name.mdx` in `dir`, in filename order. */
 export async function loadSlides(dir: string): Promise<Slide[]> {
   const names = (await readdir(dir))
-    .filter((n) => n.endsWith('.md'))
+    .filter((n) => n.endsWith('.mdx') || n.endsWith('.md'))
     .sort((a, b) => a.localeCompare(b, 'en'));
   return Promise.all(
     names.map(async (n) =>
