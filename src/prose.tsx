@@ -20,7 +20,10 @@ import {
   Booking,
   Charts,
   DataViz,
+  DevTools,
   Documents,
+  HotReload,
+  HtmlPlayground,
   Metric,
   Placeholder,
   Scenes,
@@ -29,6 +32,7 @@ import {
   Terminal,
   Timeline,
   Widgets,
+  Wire,
 } from './components/index.js';
 import { STATS } from './data.js';
 
@@ -38,7 +42,10 @@ const COMPONENTS = {
   Booking,
   Charts,
   DataViz,
+  DevTools,
   Documents,
+  HotReload,
+  HtmlPlayground,
   Metric,
   Placeholder,
   Scenes,
@@ -47,6 +54,7 @@ const COMPONENTS = {
   Terminal,
   Timeline,
   Widgets,
+  Wire,
 };
 
 const SCOPE = { stats: STATS };

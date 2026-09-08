@@ -18,5 +18,5 @@
     "types": ["node"],
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "scripts", "stories", "workbench.config.ts"]
+  "include": ["src", "scripts", "stories", "examples", "workbench.config.ts"]
 }

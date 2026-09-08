@@ -1,0 +1,29 @@
+---
+title: Save the file, keep the state
+notes: |
+  DEMO — 2 min, and the one to rehearse. Start it, click "count me" a few
+  times, type something into the field, THEN press the edit button.
+  The headline and its colour change; the count and the half-typed text do
+  not. Say the pid out loud: same process, same window, same X11 connection.
+  Better version if the room can see your editor: open
+  examples/hot-demo-app.jsx on a second screen and save it yourself. The
+  button is the one-projector fallback.
+  The button cycles three variants and the third press restores the file, so
+  the repo is clean afterwards.
+---
+
+# Fast Refresh, on a window the desktop owns
+
+`node --import react-x11/refresh/register` and nothing else: no accept
+handlers, no loader files to copy. Saving a file re-evaluates the modules
+that changed and re-renders the components that came from them, **in place**.
+
+^^^
+
+<HotReload />
+
+^^^
+
+The window, the X11 connection and the process all survive — the pid on
+screen does not change. So does every piece of state above the edit: the
+count, and whatever is half-typed in the field.

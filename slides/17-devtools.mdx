@@ -1,0 +1,37 @@
+---
+title: React DevTools, live
+notes: |
+  DEMO — 2 to 3 min. Press the button first and keep talking; the UI takes a
+  few seconds to open, then the app window appears with the bridge on.
+  In order: the tree, edit `step` on <Counter>, edit the name in <Greeting>'s
+  hook state, then the crosshair — pick a swatch by clicking it in the APP
+  window — and finally "highlight updates" while <Ticker> ticks.
+  Say why there are two windows: the flag is read before React's first
+  commit, so the deck cannot switch it on for itself.
+  If it does not come up, the panel says which half failed. Move on; the
+  next slide is the one that gets the reaction.
+---
+
+# The debugger that ships with React
+
+The component tree, the props and hook state behind each node, and a
+profiler for the commits. In a browser it is an extension talking to the
+page. Here it is the **standalone app**, and the backend talks to it over a
+socket — which is why a renderer with no DOM gets it for nothing.
+
+^^^
+
+<DevTools />
+
+^^^
+
+Two processes, because `REACT_X11_DEVTOOLS` is read before React's first
+commit: an app cannot be handed DevTools once it is running. **This deck
+cannot inspect itself** — what opens is a second app, and the tree in that
+window is its tree.
+
+^^^
+
+Edit a prop and it re-renders. Take the crosshair and pick an element by
+clicking it **in the app's window**. Turn on "highlight updates" and watch
+the ticker outline itself once a second.
