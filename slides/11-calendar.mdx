@@ -1,0 +1,39 @@
+---
+title: The desktop already knows
+notes: |
+  THE CALENDAR SLIDE — 2 min. The one demo on the deck that is not about
+  drawing. Set it up as a scenario before you touch it: "you are booking a
+  flight, and the app wants your dates."
+
+  Then land the dots. That is the user's real calendar — Google, Microsoft,
+  CalDAV, local, whatever they have — read through
+  `useDesktopCalendarEvents()`, which is D-Bus to Evolution Data Server on a
+  Linux desktop. **The application asked for nothing.** No OAuth screen, no
+  "sign in with Google", no token to store and leak. The desktop federated
+  those accounts years ago on the user's behalf, for every app on the
+  machine, and this is one of them.
+
+  Contrast it out loud, because this is the strongest version of the
+  browser argument on the whole deck: a web page in the same position
+  starts by asking you to sign into Google. It has to. It has no desktop.
+
+  Then drive it:
+   - the range is already 8–10 September, so the panel is showing the
+     clash. Drag the range off the 9th and it goes quiet.
+   - 14 and 15 are dimmed — the airline has no seats. Try to select a
+     range across them: the preview STOPS. `spanBlocked` is the other
+     reading, for holidays a booking may run across.
+   - the field at the top and the grid beside it are the same value: move
+     one, the other follows.
+
+  HONEST FOOTNOTE, and say it if anyone asks rather than volunteering it:
+  the event on this laptop is a fixture passed in as a prop, so the demo
+  needs no calendar service configured in the room. It is the hook's own
+  type, grouped by the package's own `byDay()`, handed to the same
+  `dayContent` seam — swapping the fixture for the hook is one line, and
+  the grid cannot tell the difference. That is what a seam is for.
+---
+
+# Booking a flight, on a desktop
+
+<Booking />

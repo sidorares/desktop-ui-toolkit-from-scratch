@@ -17,18 +17,37 @@ import { Formula, Markdown } from '@react-x11/components';
 import type { FenceInfo } from '@react-x11/components';
 
 import {
+  Booking,
   Charts,
+  DataViz,
+  Documents,
   Metric,
   Placeholder,
+  Scenes,
+  SourceCode,
   Stats,
   Terminal,
   Timeline,
+  Widgets,
 } from './components/index.js';
 import { STATS } from './data.js';
 
 // Module scope, all three: a new object per render re-parses every slide and
 // defeats `<Markdown>`'s per-block cache.
-const COMPONENTS = { Charts, Metric, Placeholder, Stats, Terminal, Timeline };
+const COMPONENTS = {
+  Booking,
+  Charts,
+  DataViz,
+  Documents,
+  Metric,
+  Placeholder,
+  Scenes,
+  SourceCode,
+  Stats,
+  Terminal,
+  Timeline,
+  Widgets,
+};
 
 const SCOPE = { stats: STATS };
 

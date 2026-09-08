@@ -9,16 +9,28 @@
 //
 // Module scope, so the map keeps one identity: a new object per render
 // re-parses every slide and defeats `<Markdown>`'s per-block cache.
+export { Booking } from './booking.js';
 export { Charts } from './charts.js';
+export { DataViz } from './dataviz.js';
+export { Documents } from './documents.js';
 export { Metric } from './metric.js';
 export { Placeholder } from './placeholder.js';
+export { Scenes } from './scenes.js';
+export { SourceCode } from './source-code.js';
 export { Stats } from './stats.js';
 export { Terminal } from './terminal.js';
 export { Timeline } from './timeline.js';
+export { Widgets } from './widgets.js';
 
+export type { BookingProps } from './booking.js';
 export type { ChartsProps } from './charts.js';
+export type { DataVizProps } from './dataviz.js';
+export type { DocumentsProps } from './documents.js';
 export type { MetricProps } from './metric.js';
 export type { PlaceholderProps } from './placeholder.js';
+export type { ScenesProps } from './scenes.js';
+export type { SourceCodeProps } from './source-code.js';
 export type { StatsProps } from './stats.js';
 export type { TerminalProps } from './terminal.js';
 export type { TimelineProps } from './timeline.js';
+export type { WidgetsProps } from './widgets.js';

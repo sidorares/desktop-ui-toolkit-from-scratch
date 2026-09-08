@@ -132,10 +132,21 @@ export function parseSlide(filename: string, text: string): Slide {
   };
 }
 
+/**
+ * Whether a filename in `slides/` is a slide. Exported because the watcher
+ * in `main.tsx` has to answer the same question about a filename it is
+ * handed by the OS, and a second copy of this test is a second copy to
+ * forget: a filter that says `.md` while the loader reads `.mdx` drops every
+ * save on the floor and leaves `r` looking like the only thing that works.
+ */
+export function isSlideFile(name: string): boolean {
+  return name.endsWith('.mdx') || name.endsWith('.md');
+}
+
 /** Every `NN-name.mdx` in `dir`, in filename order. */
 export async function loadSlides(dir: string): Promise<Slide[]> {
   const names = (await readdir(dir))
-    .filter((n) => n.endsWith('.mdx') || n.endsWith('.md'))
+    .filter(isSlideFile)
     .sort((a, b) => a.localeCompare(b, 'en'));
   return Promise.all(
     names.map(async (n) =>

@@ -5,13 +5,15 @@
 // and a speaker cannot fix mid-sentence. Slides read them as `{stats.prs}`
 // through `<Markdown>`'s `scope`; components import them directly.
 //
-// Counted 2026-09-08 with `git log` across the seven repositories. Merged
-// PRs come from squash-merge subjects matching `(#N)`, so they are a close
-// approximation rather than an API count — say so if anyone asks.
+// Counted 2026-09-09 with `git log` across the seven repositories — the
+// morning of the talk. Merged PRs come from squash-merge subjects matching
+// `(#N)`, so they are a close approximation rather than an API count — say so
+// if anyone asks.
 
-/** 23 July 2026, when node-x11 woke up, to the day of the talk. */
+/** 23 July 2026, when node-x11 woke up, to 9 September, the day of the
+ *  talk. */
 export const STATS = {
-  days: 47,
+  days: 48,
   commits: 983,
   prs: 586,
   newRepos: 4,

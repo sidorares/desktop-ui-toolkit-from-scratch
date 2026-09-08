@@ -4,7 +4,9 @@ A talk for MelbJS about [react-x11](https://github.com/sidorares/react-x11) —
 presented in an app built with react-x11.
 
 The deck is an X11 client. The slides are markdown; the demos are live
-components; the terminal on slide 2 is a real shell.
+components; the terminal on slide 2 is a real shell, slide 10 is the
+component library demonstrating itself, and slide 11 reads the calendar the
+desktop already has.
 
 ## Running it
 
@@ -52,6 +54,15 @@ the demo — and then the deck's keys are the deck's again. Zoom is the
 exception, because `⌘+` is an accelerator: those run *after* the focused
 element has had its refusal, so the room can be adjusted mid-demo.
 
+**Coming back to the deck means the deck has the keyboard.** macOS hands the
+click that reactivates a window straight to whatever is under the pointer —
+ntk asks for that, because on X11 a click on an unfocused window acts rather
+than only focusing — so clicking back from an editor onto a slide running a
+terminal would otherwise land *inside* the demo, and the arrow keys would
+stop being the deck's. Activating the window clears the focus instead, and
+the click that activated it is spent doing so. The way into a demo is a
+click made while the deck already has the keyboard.
+
 ## Size
 
 How big the deck has to be is a fact about the room, learned about ten
@@ -70,11 +81,34 @@ bullet that fitted on one line takes two.
 
 What scales is the type and the space around it — prose, headings, code, the
 chrome, and anything a demo draws that inherits its size, down to a chart's
-axis labels. What does **not** scale is the box a demo asked for: a
-`height: 380` is a share of a window that zoom does not resize, so growing it
-only pushes the slide's own chrome off the bottom edge. A terminal at 150% is
-the same pane with larger characters and fewer of them, which is what `⌘+`
-does to every other terminal on the machine.
+axis labels. A terminal at 150% is the same pane with larger characters and
+fewer of them, which is what `⌘+` does to every other terminal on the machine.
+
+A demo that names a `height` does **not** scale with it, and should not: that
+number is a share of a window zoom does not resize, so growing it only pushes
+the slide's own chrome off the bottom edge. Which is why the showcase demos
+name no height at all. They grow instead — `flexGrow` down a chain that is
+unbroken from the window to the chart, because `<Markdown>` renders a
+component block as the component itself rather than wrapping it in a box.
+A panel is then the same panel fullscreen, in whatever window the window
+manager felt like, and at any zoom, with no gap under it. `height` survives
+as a prop for the workbench, where a story is a fixed viewport and somebody
+has to name a number.
+
+## On the Dock
+
+The deck badges its own icon with where the talk has got to — `11 / 26`, the
+same string the footer carries — through react-x11's `useBadge`. So the
+position is readable from the Dock with something else in front of the deck,
+which is the case a presenter is actually in: notes on one screen, the deck
+on the other. It is declared rather than pushed, so the badge is up for
+exactly as long as `<Deck>` is mounted and gone when it is not.
+
+A **string** badge is a macOS-shaped choice, and worth knowing about. The
+Dock tile takes any label; the freedesktop protocol a Linux launcher listens
+to carries a *count* and has no text field at all, so on that desktop
+nothing is shown — silently, because a badge is not a feature an app should
+branch on. The position stays in the footer, where it always was.
 
 ## Writing a slide
 
@@ -144,6 +178,29 @@ shell one-liner keep its quotes and its pipe.
 | `<Metric>` | one number, said loudly |
 | `<Terminal>` | a real shell, on the in-process vt backend |
 | `<Placeholder>` | a box the size a demo will be, for one that isn't built |
+| `<Widgets>` | core's controls, a variable font's axes and an `<svg>`, on one wire |
+| `<Documents>` | markdown, maths and HTML behind one strip of `<Tabs>` |
+| `<DataViz>` | `panel=` a series, a sequence, or the architecture graph |
+| `<Scenes>` | `panel=` a live map, or a GL scene beside its own source |
+| `<SourceCode>` | a file off disk, highlighted — the demo's own, usually |
+| `<Booking>` | a flight booking that reads the desktop's calendar |
+
+`<DataViz>` and `<Scenes>` are five of slide 10's seven steps, one `panel`
+each; `<Booking>` is slide 11. Between them the showcase is every component
+this talk claims: `<box>`, `<text>`, `<textinput>` and core's widgets;
+variable-font axes read off the font file; `<svg>`; `<Markdown>`, `<Formula>`
+and `<Html>`; `<Tabs>`; charts, the timeline, the flow pane with three nodes
+that are forms, the map, a GL scene, and the calendar. Grouped rather than
+listed, because a step that makes three claims at once beats three steps.
+
+Two of them are worth knowing about on their own. `<SourceCode>` reads a file
+from the repo — anchored on *text* rather than line numbers, so a slice
+survives an edit above it — which is how the scene demo shows the code it is
+running from without a second copy to go stale. And `<Booking>` takes its
+calendar events as a **prop**: on the slide that is a fixture, in an
+application it is `useDesktopCalendarEvents().events`, and since the
+integration arrives through `<Calendar dayContent>` the grid cannot tell the
+difference — so the demo needs no calendar service configured in the room.
 
 Components read `useStep()`, so one of them can be both halves of a point:
 `<Charts revealAt={1} />` shows eleven quiet years, then rescales its axis
@@ -166,7 +223,7 @@ else wrote would be handing it `new Function`.
 ## The workbench
 
 The components are developed in [`@react-x11/workbench`](https://github.com/sidorares/react-x11-workbench),
-not by re-running the deck and arrowing to slide 19:
+not by re-running the deck and arrowing to slide 21:
 
 ```bash
 npm run workbench      # bunx @react-x11/workbench dev
@@ -174,9 +231,18 @@ npx x11-workbench ls   # what it found
 ```
 
 Each component on its own, every variant at once, props editable while it
-runs. `stories/` has 23 stories across the six — including both sides of
+runs. `stories/` has 54 stories across the thirteen — including both sides of
 every step reveal, which is the behaviour most likely to break quietly and
 least likely to be noticed until it breaks on stage.
+
+`workbench.config.ts` wraps every story in the deck's own palette
+([`src/theme.ts`](src/theme.ts)), and that is not decoration. A story renders
+a component bare, and a react-x11 tree with no `<ThemeProvider>` above it
+follows the **desktop** — so on a Mac whose accent is orange, a control that
+is `#58a6ff` on the projector comes up orange in the workshop, and the menu a
+`<Select>` drops comes up in the library's defaults. Planting the deck's
+palette once, outside every story, is the difference between a workshop and a
+lookalike.
 
 ## Fidelity
 

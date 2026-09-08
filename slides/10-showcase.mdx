@@ -1,0 +1,93 @@
+---
+title: The whole box
+reveal: replace
+notes: |
+  THE SHOWCASE — 4 min. `reveal: replace`, so each step swaps the panel
+  rather than stacking it; arrow DOWN between them. One sentence per step,
+  then let them look.
+
+  No panel names a height: every one of them grows into whatever the slide
+  has left, so this reads the same fullscreen, in a window the size the
+  window manager felt like, and at any zoom.
+
+  1 — core. Everything here is `react-x11` itself: no components package.
+      Drag the weight slider and say "those are the font file's own axes,
+      read off the machine this is running on" — then type in the field and
+      let the specimen and the vector move together.
+      CAREFUL: clicking the field gives it the keyboard, so `space` types a
+      space. `Esc`, or click the background, hands it back.
+  2 — three documents behind one strip of tabs. Land the HTML tab: that
+      `<select>` is not a picture of a menu, it is the same menu. Switch
+      tabs and back to show the panels stayed alive.
+  3 — the chart. Slide 22's numbers drawn as an area instead of bars, so
+      nothing new is being claimed here; the component is the point.
+  4 — the timeline. The one thing on this slide that registers no element:
+      box, text, and one absolutely-positioned pixel down the gutter.
+  5 — the architecture, and the slide's best three minutes if you have
+      them. Say what the graph says — five stages from setState to the
+      wire, the backend swapped in one place — then OPERATE it: flip the
+      backend radio and watch a branch go, turn the paint cache off and
+      watch the edge start marching, tick a desktop hook and the D-Bus
+      wing appears. Those are real widgets inside a drawn graph, which is
+      the seam worth naming. The pane's own controls are bottom-left and
+      the minimap bottom-right: the third control button re-frames the
+      graph after you have dragged something into the weeds. The wheel
+      zooms, and under 0.6 the form nodes stop mounting, which is the
+      budget that makes drawing the default.
+      The bottom wing is this deck: `useBadge` reaches the Dock without
+      touching yoga, paint or the X connection.
+  6 — the map is LIVE over the network. If the room's wifi is out it says
+      so and draws the style's background — that is fine, say it out loud
+      and move on.
+  7 — GL through `<glarea>`, and the best closing beat on the slide. Drive
+      the scene from the bar: spin to 0 and back, wireframe on, swap the
+      shape, open the colour field. Then hit the SOURCE tab — that is the
+      file this demo is running from, read off disk, not a snippet pasted
+      into a slide. Point at the props in it and at the widgets that were
+      moving them. If somebody asks: yes, editing the file and pressing
+      `r` updates the listing.
+
+  If you are behind schedule, cut to steps 1, 5 and 6: core, the
+  architecture and the two hard ones carry the claim, and 2, 3 and 4 are
+  the ones people ask about after.
+---
+
+# All of this is core
+
+<Widgets />
+
+^^^
+
+# Three documents, one strip of tabs
+
+<Documents />
+
+^^^
+
+# A series, a sequence, a graph
+
+<DataViz panel="charts" />
+
+^^^
+
+# A series, a sequence, a graph
+
+<DataViz panel="timeline" />
+
+^^^
+
+# A series, a sequence, a graph
+
+<DataViz panel="flow" />
+
+^^^
+
+# A map that pans
+
+<Scenes panel="map" />
+
+^^^
+
+# …and a scene that spins, beside its own source
+
+<Scenes panel="three" />
