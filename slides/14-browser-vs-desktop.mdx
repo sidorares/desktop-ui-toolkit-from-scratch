@@ -1,0 +1,59 @@
+---
+title: What the browser gives, and takes
+notes: |
+  The left column's ceiling. Be fair first — the list of what a page gets
+  free is genuinely enormous and this room lives on it.
+  Then the mechanism, which is the part worth learning: a web page is a
+  SANDBOX, and it is a sandbox in a specific shape. Nothing your UI draws can
+  leave the page, and anything that touches the desktop has to be serialised
+  to another process that can.
+  Land the last step hard, because it is the thesis arriving from the other
+  direction: in an Electron app you end up writing your OWN protocol, by
+  hand, between the half that draws and the half that can act. The talk's
+  claim is not "protocols are bad" — it is that you are already writing one.
+  The sleep inhibitor is live on this slide. Say it.
+  3 min.
+---
+
+# The browser is very good at the other half
+
+A web page gets **the easy 20% for free**, and it is a colossal 20%: layout,
+text shaping, bidi, font fallback, a compositor, an accessibility tree, i18n,
+and a rendering pipeline thousands of people have tuned for twenty years.
+
+If your application is a document, this is the right answer. Use it.
+
+^^^
+
+What it gives up is the other 80%, and it gives it up in a **specific shape**:
+
+**Nothing your UI draws can leave the page.**
+
+- A menu cannot become the desktop's menu — it is a `<div>`
+- A popup cannot be a real window with its own hints; it is clipped to the
+  viewport it was born in
+- A tray icon is not expressible at all
+
+^^^
+
+**And anything that touches the desktop has to be serialised to another
+process.**
+
+Files, D-Bus, the tray, the global menu, keep-awake, per-monitor scale — none
+of it is reachable from the half of your app that draws. It lives in the main
+process, in a different language, behind an IPC channel.
+
+^^^
+
+So the component that needs the desktop and the code that can reach it are on
+**opposite sides of a serialisation boundary** — and you maintain the message
+format between them, by hand, for every interaction.
+
+> Which means an Electron app is *also* a protocol client.
+> It is just a protocol you had to invent, and you are its only implementer.
+
+^^^
+
+While this slide has been up, this deck has been holding a **sleep inhibitor**,
+so the screen cannot blank mid-talk. One hook — `useKeepAwake()` — called from
+the component that cares. No channel, no main process, no message.

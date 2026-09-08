@@ -1,0 +1,52 @@
+---
+title: How this is done today
+notes: |
+  The slide that answers the question the room has been holding since the
+  cold open, so open by saying so — it gets a laugh and it shows you know.
+  Both groups are GOOD answers. Be generous about them: Electron ships the
+  editor half this room writes code in, and nodegui gives you real Qt
+  widgets. Nobody here should feel sold to.
+  The point is not that they are wrong. It is that they are both **wrappers**
+  — one wraps a browser, one wraps a toolkit — and neither makes the toolkit
+  out of JS. That is the gap, and the next two slides are the ceiling each
+  group hits.
+  If asked about React Native for desktop: same shape as the right column,
+  a JS tree driving a native widget tree over a bridge.
+  2 min.
+---
+
+# You have been waiting eleven slides to ask this
+
+Why would anyone build this? People run JavaScript on the desktop every day.
+
+^^^
+
+And they do it in one of **two** ways:
+
+| wrap a browser | wrap a toolkit |
+| --- | --- |
+| **Electron** — ship Chromium and Node together | **nodegui** — Qt, over bindings |
+| **Tauri** — borrow the OS webview, Rust behind it | **nodegui-react** — React onto those widgets |
+| Neutralino, Wails — the same trade, smaller | **node-gtk** — GTK, through GObject introspection |
+| your UI is a **web page** | **gtkx** — React onto *those* widgets |
+
+^^^
+
+Both are good answers, and I want to be clear about that. Electron ships the
+editor most of this room writes code in. nodegui hands you real Qt widgets
+that a Qt developer would recognise.
+
+^^^
+
+But look at what they have in common. **Both are wrappers.**
+
+One wraps a rendering engine that was built for documents. The other wraps a
+toolkit that was built for C++.
+
+^^^
+
+In neither case is the toolkit itself made of the language you are writing.
+There is always a boundary, and the interesting question is **what that
+boundary costs you** — which is different for each.
+
+> Two slides, one per column.

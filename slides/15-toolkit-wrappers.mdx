@@ -1,0 +1,50 @@
+---
+title: What a binding gives, and takes
+notes: |
+  The right column's ceiling, and the shorter of the two slides — but do not
+  skip it, because without it the talk looks like it only considered Electron.
+  Be generous again: real widgets, real native look, real accessibility, and
+  you did not implement any of it. That is a genuine win and it is the thing
+  react-x11 works hardest to earn.
+  The cost is the boundary. Your React tree is not the widget tree; it is a
+  script driving one. Which means the toolkit's threading model, event loop
+  and build story are all yours to inherit, and the thing you cannot do is
+  change how any of it works.
+  Then the turn: both columns are a boundary, so the question is where you
+  want it. Straight into the reconciler slide.
+  90 seconds.
+---
+
+# The other column: real widgets, over a bridge
+
+`nodegui` hands you Qt. `node-gtk` hands you GTK. Both give you widgets a
+native developer would recognise — the platform's own look, its own
+accessibility, its own decades of work — and you implemented none of it.
+
+That is a real win, and it is the thing this project has to work hardest to
+earn.
+
+^^^
+
+The cost is the boundary, and it is in a different place:
+
+- **Your tree is not the widget tree.** It is a script that *drives* one.
+  Every prop crosses a language boundary to get there
+- You inherit their **threading model**, their **event loop** and their
+  **build story** — Qt or GTK has to be on the machine, and `node-gyp` has to
+  have worked
+- And the layer you most want to change is the layer you cannot reach
+
+^^^
+
+So: both columns are a **boundary**. One puts it between your UI and the
+desktop; the other puts it between your code and the widgets.
+
+^^^
+
+The question this talk is: **what if there were no boundary?** What if the
+layout, the text, the painting and the protocol were all just JavaScript you
+could open and read?
+
+> Which is a terrible idea, for about six good reasons.
+> Let us find out what they are.
