@@ -10,6 +10,15 @@ import { readdir, readFile } from 'node:fs/promises';
 
 export type SlideLayout = 'default' | 'title' | 'full';
 
+/**
+ * What a reveal marker does. `cumulative` (the default) adds the next part
+ * to what is already on screen — the right model for prose, where a step is
+ * one more bullet. `replace` shows only the part it belongs to, which is
+ * what a slide that runs one demo at a time needs: four charts stacked down
+ * the screen is not four steps of a demo, it is a mess.
+ */
+export type RevealMode = 'cumulative' | 'replace';
+
 export interface Slide {
   /** The filename without its number prefix or extension — a stable id. */
   id: string;
@@ -17,8 +26,12 @@ export interface Slide {
   /** Speaker notes, for the presenter view. */
   notes: string;
   layout: SlideLayout;
-  /** Markdown, cumulative: `chunks[n]` is everything visible at step n. */
+  /** Markdown: `chunks[n]` is what is visible at step n. */
   chunks: string[];
+  reveal: RevealMode;
+  /** The body as written, reveal markers and all — for tooling that wants
+   *  the whole slide rather than one of its steps. */
+  source: string;
   steps: number;
 }
 
@@ -31,7 +44,10 @@ const FENCE = /^\s{0,3}(`{3,}|~{3,})/;
  * Split on reveal markers, but not on one that fell inside a fenced code
  * block — a `^^^` in a shell transcript is a caret, not a slide step.
  */
-export function splitReveals(body: string): string[] {
+export function splitReveals(
+  body: string,
+  mode: RevealMode = 'cumulative',
+): string[] {
   const parts: string[][] = [[]];
   let fence: string | null = null;
   for (const line of body.split('\n')) {
@@ -46,13 +62,15 @@ export function splitReveals(body: string): string[] {
     }
     parts[parts.length - 1]!.push(line);
   }
+  const trim = (t: string) => t.replace(/\s+$/, '');
+  if (mode === 'replace') return parts.map((part) => trim(part.join('\n')));
   // Cumulative: a step shows everything up to and including its own part, so
   // the reveal is additive rather than a replacement.
   const out: string[] = [];
   let seen = '';
   for (const part of parts) {
     seen = seen ? `${seen}\n${part.join('\n')}` : part.join('\n');
-    out.push(seen.replace(/\s+$/, ''));
+    out.push(trim(seen));
   }
   return out;
 }
@@ -88,9 +106,14 @@ function isLayout(v: string | undefined): v is SlideLayout {
   return v === 'default' || v === 'title' || v === 'full';
 }
 
+function isReveal(v: string | undefined): v is RevealMode {
+  return v === 'cumulative' || v === 'replace';
+}
+
 export function parseSlide(filename: string, text: string): Slide {
   const { meta, body } = parseFrontmatter(text);
-  const chunks = splitReveals(body);
+  const reveal = isReveal(meta.reveal) ? meta.reveal : 'cumulative';
+  const chunks = splitReveals(body, reveal);
   const id = filename.replace(/\.md$/, '').replace(/^\d+[-_]?/, '');
   return {
     id,
@@ -103,6 +126,8 @@ export function parseSlide(filename: string, text: string): Slide {
     notes: meta.notes ?? '',
     layout: isLayout(meta.layout) ? meta.layout : 'default',
     chunks,
+    reveal,
+    source: body,
     steps: chunks.length,
   };
 }

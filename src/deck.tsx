@@ -137,11 +137,24 @@ export function Deck({
         onKeyDown={onKeyDown}
         style={{ backgroundColor: '$background' }}
       >
-        <box style={{ flexGrow: 1, padding: 48, gap: 16 }}>
+        <box
+          style={{
+            flexGrow: 1,
+            gap: 16,
+            // `title` centres its block vertically and gives it more room to
+            // breathe; `full` hands the whole window to a demo. Everything
+            // else is a document, and reads from the top.
+            padding: slide.layout === 'full' ? 0 : 48,
+            justifyContent:
+              slide.layout === 'title' ? 'center' : 'flex-start',
+          }}
+        >
           <StepProvider value={stepState}>
             <Prose
               key={`${slide.id}:${step}`}
               source={slide.chunks[step] ?? ''}
+              fontSize={slide.layout === 'title' ? 26 : 22}
+              grow={slide.layout !== 'title'}
             />
           </StepProvider>
         </box>

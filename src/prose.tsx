@@ -26,16 +26,26 @@ export interface ProseProps {
   source: string;
   /** Base size. Headings scale from it, so this is the deck's one dial. */
   fontSize?: number;
+  /**
+   * Fill the slide (default). A centred slide passes false: a document that
+   * grows to the full height has already consumed the free space its parent
+   * would otherwise have distributed, so `justifyContent` does nothing.
+   */
+  grow?: boolean;
 }
 
-export function Prose({ source, fontSize = 22 }: ProseProps): ReactElement {
+export function Prose({
+  source,
+  fontSize = 22,
+  grow = true,
+}: ProseProps): ReactElement {
   return (
     <Markdown
       source={source}
       partial={false}
       fences={FENCES}
       fontSize={fontSize}
-      style={{ flexGrow: 1 }}
+      style={grow ? { flexGrow: 1 } : {}}
     />
   );
 }

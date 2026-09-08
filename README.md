@@ -80,8 +80,22 @@ them — three markers is four steps — so adding a beat is adding a line, and
 nothing declares a step count anywhere. A `^^^` inside a fenced code block
 is left alone.
 
-Reveals are cumulative: step *n* shows everything up to and including part
-*n*.
+Reveals are cumulative by default: step *n* shows everything up to and
+including part *n*. A slide that runs one demo at a time wants the other
+model, and asks for it in frontmatter:
+
+```markdown
+---
+reveal: replace
+---
+```
+
+Then each step shows only its own part. Four charts stacked down the screen
+are not four steps of a demo.
+
+Other frontmatter keys: `title` (defaults to the first heading, then the
+filename), `notes`, and `layout` — `default`, `title` (vertically centred,
+larger type) or `full` (no padding, for a slide that is all demo).
 
 ## Live demos
 
@@ -136,6 +150,7 @@ Until that lands, `npm run x11` under XQuartz is the full-fidelity path.
 | | |
 | --- | --- |
 | `slides/` | the talk, one markdown file per slide |
+| `scripts/smoke.ts` | every slide parsed, with step and demo counts |
 | `src/deck.tsx` | window, key map, chrome |
 | `src/slides.ts` | frontmatter + reveal parsing |
 | `src/steps.tsx` | `useStep()`, `at()`, `<Step>` |

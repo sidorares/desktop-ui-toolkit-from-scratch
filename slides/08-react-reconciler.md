@@ -1,17 +1,16 @@
 ---
 title: From protocol to React
 notes: |
-  Keep the reconciler explanation SHORT — this audience is a JS meetup, they
-  know React. The interesting part isn't "React can have renderers", it's
-  which host operations X11 forces you to implement.
+  Keep the reconciler part SHORT — this is a JS meetup, they know React has
+  renderers. The interesting half is the second one: with no DOM underneath,
+  everything the DOM was quietly doing becomes yours.
+  Read that list slowly. It is the honest scope of "from scratch".
 ---
 
 # React needs a host, not a DOM
 
-`react-reconciler` asks for a host config: how to create an instance,
-append a child, commit an update, and measure.
-
-^^^
+`react-reconciler` asks for a host config — how to make a thing, put it in
+another thing, and update it:
 
 ```js
 createInstance(type, props)      // a retained node — <box>, <text>, …
@@ -21,5 +20,18 @@ commitUpdate(node, old, next)    // diffed props land here
 
 ^^^
 
-There is no DOM underneath. The nodes are **ours** — they hold a yoga
-layout node, a style, and enough state to paint themselves.
+That part is a weekend.
+
+^^^
+
+The rest is everything the DOM was doing for you and never mentioned:
+
+- **Layout** — yoga, one node per element, run client-side
+- **Text** — shaping, bidi, ligatures, font fallback, wrapping
+- **Painting** — damage tracking, double buffering, clipping, z-order
+- **Events** — hit testing front-to-back, capture and bubble, enter/leave
+- **Focus** — traversal order, focus scopes, what a modal takes and returns
+
+^^^
+
+**That** is "from scratch". The reconciler is the easy end of it.
