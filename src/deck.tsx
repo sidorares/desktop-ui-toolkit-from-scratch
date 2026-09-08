@@ -48,6 +48,7 @@ import {
 
 import { Prose } from './prose.js';
 import { DECK_THEME } from './theme.js';
+import { actOf } from './acts.js';
 import { StepProvider } from './steps.js';
 import {
   ZOOM_DEFAULT,
@@ -285,6 +286,7 @@ export function Deck({
   }
 
   const progress = slides.length > 1 ? index / (slides.length - 1) : 1;
+  const act = actOf(index);
 
   return (
     // The zoom provider goes *outside* the theme, not between it and the
@@ -361,6 +363,16 @@ export function Deck({
                 }}
               />
             </box>
+            {/* The section, in words. A number says how much is left; the
+                name says what the room is currently being told, which is the
+                half a presenter cannot get from the progress bar and an
+                audience cannot get at all. Silent on the title slides at
+                either end — see `acts.ts`. */}
+            {act ? (
+              <text style={{ fontSize: px(12), color: '$textMuted' }}>
+                {act}
+              </text>
+            ) : null}
             {slide.steps > 1 ? (
               <text style={{ fontSize: px(12), color: '$textMuted' }}>
                 {`step ${step + 1}/${slide.steps}`}
