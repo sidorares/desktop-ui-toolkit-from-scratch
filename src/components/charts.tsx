@@ -1,4 +1,4 @@
-// The commit histogram behind the "15 years and 47 days" slide, drawn by
+// The commit histogram behind the "15 years and 48 days" slide, drawn by
 // `@react-x11/components/charts` — so the chart making the argument is drawn
 // by the toolkit the argument is about.
 //
