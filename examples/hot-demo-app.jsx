@@ -21,7 +21,7 @@ import { Button } from 'react-x11';
 import { onReload } from 'react-x11/refresh';
 
 // The two lines the slide's button rewrites.
-const HEADLINE = 'Edit me while I run'; // hot:headline
+const HEADLINE = "Edit me while I run"; // hot:headline
 const ACCENT = '#2980b9'; // hot:accent
 
 /** State that must survive the edit. */

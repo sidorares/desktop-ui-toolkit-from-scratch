@@ -19,9 +19,8 @@
 // can wedge itself on a million points should not be able to take the talk
 // down with it.
 import type { ChildProcess } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
+import { ROOT, runScript } from './runtime.js';
 import {
   createStore,
   IDLE,
@@ -31,10 +30,13 @@ import {
 } from './processes.js';
 import type { ProcessState } from './processes.js';
 
-const ROOT = fileURLToPath(new URL('..', import.meta.url));
-
 export const EXAMPLE = 'examples/charts.tsx';
-export const COMMAND = `npx tsx ${EXAMPLE}`;
+
+// Derived, not written out: the command on the slide is the command that
+// runs, and under bun that is `bun examples/charts.tsx` with no loader —
+// see `runtime.ts`.
+const RUN = runScript(EXAMPLE);
+export const COMMAND = RUN.display;
 
 export interface ChartsDemoState {
   app: ProcessState;
@@ -59,11 +61,8 @@ export function start(): void {
   const run = ++generation;
   store.set({ note: '', app: { status: 'starting', detail: EXAMPLE } });
   app = spawnDetached({
-    // This same node with tsx's loader, rather than a `npx tsx` bin lookup:
-    // one less thing to resolve on a conference machine, and the runtime the
-    // deck is already proven to work under.
-    command: process.execPath,
-    args: ['--import', 'tsx', path.join(ROOT, EXAMPLE)],
+    command: RUN.command,
+    args: RUN.args,
     cwd: ROOT,
     onStderr: (note) => run === generation && store.set({ note }),
     onError: (detail) => {

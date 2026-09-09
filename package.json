@@ -19,11 +19,13 @@
     "render": "tsx scripts/render.tsx",
     "smoke": "tsx scripts/smoke.ts",
     "example:charts": "tsx examples/charts.tsx",
-    "check:pace": "tsx scripts/pace-check.ts"
+    "check:pace": "tsx scripts/pace-check.ts",
+    "start:bun": "bun src/main.tsx",
+    "check:launchers": "tsx scripts/launch-check.ts"
   },
   "dependencies": {
     "@lydell/node-pty": "^1.1.0",
-    "@react-x11/components": "^0.7.0",
+    "@react-x11/components": "^0.7.1",
     "react": "^19.2.8",
     "react-x11": "^2.10.1"
   },

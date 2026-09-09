@@ -12,7 +12,28 @@ desktop already has.
 
 ```bash
 npm install
-npm start
+npm start        # node, through tsx
+npm run start:bun
+```
+
+**Either runtime works, and the launcher slides adapt to which one you used.**
+That is not cosmetic: the buttons on the wire, DevTools, Fast Refresh and
+charts slides spawn child processes, and they used to spawn
+`process.execPath` — which under `bun src/main.tsx` is *bun*, so every one of
+them ran `bun --import tsx …` and died on a Node loader bun does not want.
+`src/runtime.ts` resolves it per example now: bun runs TS and JSX with no
+loader at all, Node gets `--import tsx` only for files that need it, and the
+command printed on the slide is derived from the same call so it cannot drift
+from the one that ran.
+
+**Fast Refresh is the exception and needs Node.**
+`react-x11/refresh/register` uses Node's `module.registerHooks`, which bun
+does not implement, so that one launcher asks for `node` by name even when the
+deck itself is bun. On a machine with no `node` on `PATH` it fails in the
+panel like any other launcher.
+
+```bash
+npm run check:launchers   # what each one resolves to, and whether it starts
 ```
 
 On macOS this runs on react-x11's native Cocoa backend, which is the one to

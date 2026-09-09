@@ -16,6 +16,7 @@ import type { ChildProcess } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { runOnNode } from './runtime.js';
 import {
   createStore,
   IDLE,
@@ -37,7 +38,14 @@ export const EXAMPLE = 'examples/hot-demo.jsx';
 export const EDITED = 'examples/hot-demo-app.jsx';
 
 /** What the button does, in the form a presenter would type. */
-export const COMMAND = `node --import react-x11/refresh/register ${EXAMPLE}`;
+// **Node only.** `react-x11/refresh/register` needs Node's
+// `module.registerHooks`, which bun does not implement — so this asks for
+// Node by name even when the deck itself is running under bun.
+const RUN = runOnNode(
+  ['--enable-source-maps', '--import', 'react-x11/refresh/register'],
+  EXAMPLE,
+);
+export const COMMAND = RUN.display;
 
 /** What "apply an edit" cycles through. [0] is the file as committed. */
 export const EDITS = [
@@ -72,13 +80,8 @@ export function start(): void {
   app = spawnDetached({
     // The loader is a `--import`, so this is `npm run example:hot` with the
     // deck's own node rather than a shell.
-    command: process.execPath,
-    args: [
-      '--enable-source-maps',
-      '--import',
-      'react-x11/refresh/register',
-      path.join(ROOT, EXAMPLE),
-    ],
+    command: RUN.command,
+    args: RUN.args,
     cwd: ROOT,
     onStderr: (note) => run === generation && store.set({ note }),
     onError: (detail) => {
