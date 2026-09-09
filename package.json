@@ -18,7 +18,8 @@
     "shot": "tsx scripts/shot.tsx",
     "render": "tsx scripts/render.tsx",
     "smoke": "tsx scripts/smoke.ts",
-    "example:charts": "tsx examples/charts.tsx"
+    "example:charts": "tsx examples/charts.tsx",
+    "check:pace": "tsx scripts/pace-check.ts"
   },
   "dependencies": {
     "@lydell/node-pty": "^1.1.0",

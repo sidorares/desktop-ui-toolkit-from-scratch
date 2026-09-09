@@ -35,6 +35,8 @@ npm run x11
 | `f` | toggle fullscreen (asks the window manager) |
 | `Esc` | hand the keyboard back to the deck, else leave fullscreen |
 | `r` | re-read `slides/` from disk (saves reload on their own) |
+| `p` | start the **pacemaker**, then pause / resume it |
+| `P` | reset the pacemaker to zero |
 | `⌘+` `⌘-` | **bigger** / **smaller** — `Ctrl` too, for a Linux desktop |
 | `⌘0` | back to 100% |
 
@@ -62,6 +64,34 @@ terminal would otherwise land *inside* the demo, and the arrow keys would
 stop being the deck's. Activating the window clears the focus instead, and
 the click that activated it is spent doing so. The way into a demo is a
 click made while the deck already has the keyboard.
+
+## Pacing
+
+`p` starts a second progress line under the first one, and it fills once over
+**forty minutes**. Press it again to pause — for a question, or an
+interruption — and again to resume; `P` puts it back to zero for the next
+rehearsal.
+
+**The point is the gap between the two lines, not either line on its own.**
+The top one is where the slides have got to; the bottom one is where the clock
+has. If the bottom line is ahead of the top one, you are behind. That is a
+question a digital clock in the corner cannot answer without arithmetic
+performed on stage.
+
+The colour says it again for the back of the room, where two-pixel lines are
+hard to compare: muted while the two are within two minutes of each other,
+amber once the clock is meaningfully ahead, red once the slot is gone. The
+number beside it is time **remaining**, because "eleven minutes" is a decision
+and "twenty-nine minutes elapsed" is a subtraction.
+
+Nothing is drawn until it is armed, so a talk given without it looks exactly
+as it did before — and the two pixels are reserved either way, so pressing `p`
+mid-sentence does not reflow the slide above it.
+
+The clock is derived from a wall-clock start rather than counted in ticks, so
+a dropped timer or a machine that slept does not show up as drift.
+`npm run check:pace` asserts that, along with pause banking time instead of
+losing it and the colour thresholds firing where they should.
 
 ## Size
 

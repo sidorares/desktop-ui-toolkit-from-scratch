@@ -1035,6 +1035,11 @@ Wayland first."]*
 
 # Timing, and what to cut
 
+**Press `p` when you start.** The second footer line fills once over the
+forty minutes, under the slide line — if it gets ahead of the slide line you
+are behind, and the colour says so from the back of the room. `p` again
+pauses it for a question.
+
 | act | slides | budget |
 | --- | --- | --- |
 | Cold open | 01–02 | 2:30 |
