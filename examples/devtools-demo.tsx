@@ -19,12 +19,30 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { Button, createRoot } from 'react-x11';
 
+import { backendRemedy, missingBackend } from '../src/devtools-backend.js';
+
+// **Why the hooks here have names.** React works out where a hook was called
+// from by capturing a stack, and V8 keeps ten frames — fewer than a loader
+// leaves between the hook and its call site, and `tsx` costs about ten. So
+// under a loader the call site falls off the end, `hookSource` comes back
+// null, and DevTools shows the hooks *unnamed*, on a slide whose whole point
+// is looking at hooks. react-x11 2.10.2 raises `Error.stackTraceLimit` in
+// `prepare()` when the flag is set, so this file does not have to and nor
+// does the command line that started it — which is worth knowing, because
+// an app on an older react-x11 needs `--stack-trace-limit=50` itself.
+
 /** Whether this process was started the way the demo wants. Said on screen,
  *  because a window that looks fine while nothing is connected is the most
  *  confusing thing that can happen on stage. */
 const BRIDGE = process.env.REACT_X11_DEVTOOLS === '1';
 const HOST = process.env.REACT_X11_DEVTOOLS_HOST || 'localhost';
 const PORT = process.env.REACT_X11_DEVTOOLS_PORT || '8097';
+
+/** The third state, and the one worth having a line for: the flag is set and
+ *  the backend cannot be imported. react-x11 warns on stdout and runs on
+ *  without a bridge, so without this the window is indistinguishable from a
+ *  healthy one whose DevTools is slow to connect. */
+const MISSING = BRIDGE ? missingBackend(import.meta.url) : [];
 
 /** One labelled row. Named, because the tree should read as a list of nouns. */
 function Panel({
@@ -143,10 +161,17 @@ function App(): ReactElement {
     >
       <box style={{ flexGrow: 1, padding: 18, gap: 12 }}>
         <text style={{ fontSize: 19 }}>Inspect me</text>
-        <text style={{ fontSize: 12, color: '$textMuted' }}>
-          {BRIDGE
-            ? `bridge on — talking to ${HOST}:${PORT}`
-            : 'bridge off — restart with REACT_X11_DEVTOOLS=1'}
+        <text
+          style={{
+            fontSize: 12,
+            color: MISSING.length ? '$danger' : '$textMuted',
+          }}
+        >
+          {!BRIDGE
+            ? 'bridge off — restart with REACT_X11_DEVTOOLS=1'
+            : MISSING.length
+              ? `bridge unavailable: ${backendRemedy(MISSING)}`
+              : `bridge on — talking to ${HOST}:${PORT}`}
         </text>
         <Counter step={1} />
         <Greeting />

@@ -3,13 +3,23 @@ title: React DevTools, live
 notes: |
   DEMO — 2 to 3 min. Press the button first and keep talking; the UI takes a
   few seconds to open, then the app window appears with the bridge on.
-  In order: the tree, edit `step` on <Counter>, edit the name in <Greeting>'s
-  hook state, then the crosshair — pick a swatch by clicking it in the APP
-  window — and finally "highlight updates" while <Ticker> ticks.
+  Stable things first, fragile last. Hover a node in the tree and one rect
+  tints over in the app; take the crosshair and pick a swatch by clicking it
+  in the APP window; turn on "highlight updates" and let <Ticker> outline
+  itself. Then the edits, which are the part that needs a selection: `step`
+  on <Counter>, and the name in <Greeting>'s hook state.
+  Selecting a component that has hooks can take the DevTools window down.
+  Before you start, check ⚙ → Components → "always parse hook names for the
+  selected element" is OFF — with it on the crash is reliable. If the window
+  dies anyway, press "Restart DevTools" and carry on: the app is still
+  running and the backend reconnects to the new one by itself. Do not press
+  Stop, which throws away the tree the room was looking at.
   Say why there are two windows: the flag is read before React's first
   commit, so the deck cannot switch it on for itself.
-  If it does not come up, the panel says which half failed. Move on; the
-  next slide is the one that gets the reaction.
+  If it does not come up, the panel says which half failed — including
+  "not installed", which is the demo refusing to start rather than starting
+  without a bridge. Move on; the next slide is the one that gets the
+  reaction.
 ---
 
 # The debugger that ships with React

@@ -8,12 +8,21 @@
 // up. That second half is also why the deck cannot inspect itself: `npm
 // start` did not set the flag, and nothing at runtime can. Hence a second
 // process, and hence this file.
+//
+// Three things can go wrong, and the panel says which. The UI may not open.
+// It may open and not listen. And — the one that used to be silent — the app
+// may be unable to speak the protocol at all, because react-x11 loads the
+// backend lazily and shrugs when it is not installed. That third one is a
+// preflight rather than a failure: a demo that cannot work should not start,
+// because a window that looks right with no bridge behind it is the hardest
+// thing on this slide to diagnose in front of a room.
 import type { ChildProcess } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { createConnection } from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { backendRemedy, missingBackend } from './devtools-backend.js';
 import {
   createStore,
   IDLE,
@@ -64,8 +73,17 @@ let ui: ChildProcess | null = null;
 let app: ChildProcess | null = null;
 
 /** Bumped by every start and stop, so a port wait or an exit belonging to a
- *  run the presenter has already stopped is ignored. */
-let generation = 0;
+ *  run the presenter has already stopped is ignored. One counter per half,
+ *  because the UI can be restarted under a running app — see `restartUi`. */
+let uiGeneration = 0;
+let appGeneration = 0;
+
+/** Which of the backend's packages the demo would fail to import, if any.
+ *  Resolved from the *demo's* own path, since that is the process that does
+ *  the importing. */
+export function missing(): string[] {
+  return missingBackend(path.join(ROOT, EXAMPLE));
+}
 
 /**
  * The standalone UI. A local install is preferred over `npx` deliberately: a
@@ -103,17 +121,63 @@ function sleep(ms: number): Promise<void> {
 async function waitForPort(run: number, seconds = 30): Promise<boolean> {
   const deadline = Date.now() + seconds * 1000;
   while (Date.now() < deadline) {
-    if (run !== generation) return false;
+    if (run !== uiGeneration) return false;
     if (await probe()) return true;
     await sleep(250);
   }
   return false;
 }
 
+/** The other direction: a standalone we have just killed may still be
+ *  holding 8097 when its replacement tries to bind it, and the replacement's
+ *  failure to bind looks exactly like a restart that did nothing. */
+async function waitForPortFree(run: number, seconds = 5): Promise<void> {
+  const deadline = Date.now() + seconds * 1000;
+  while (Date.now() < deadline) {
+    if (run !== uiGeneration) return;
+    if (!(await probe())) return;
+    await sleep(150);
+  }
+}
+
+/** The standalone, and the state it reports through. */
+function spawnUi(run: number): void {
+  ui = spawnDetached({
+    ...uiCommand(),
+    cwd: ROOT,
+    onStderr: (note) => run === uiGeneration && store.set({ note }),
+    onError: (detail) => {
+      ui = null;
+      if (run === uiGeneration) store.set({ ui: { status: 'failed', detail } });
+    },
+    onExit: (detail) => {
+      ui = null;
+      if (run === uiGeneration) store.set({ ui: { status: 'exited', detail } });
+    },
+  });
+}
+
 /** Both halves, in order: the UI, then the port, then the app. */
 export async function start(): Promise<void> {
   if (isRunning()) return;
-  const run = ++generation;
+
+  // Preflight. react-x11 imports the backend lazily and only warns when the
+  // import throws, so without this the button starts two processes that
+  // cannot ever talk to each other and look for all the world like they are
+  // about to.
+  const absent = missing();
+  if (absent.length) {
+    store.set({
+      ui: { status: 'idle', detail: 'not started — nothing could talk to it' },
+      app: { status: 'failed', detail: backendRemedy(absent) },
+      note:
+        'react-x11 imports these lazily, so the demo would have come up with no bridge at all.',
+    });
+    return;
+  }
+
+  const uiRun = ++uiGeneration;
+  const appRun = ++appGeneration;
   store.set({ note: '', app: { status: 'idle', detail: `waiting for ${HOST}:${PORT}` } });
 
   // Something already on the port is a DevTools the presenter opened by
@@ -125,22 +189,10 @@ export async function start(): Promise<void> {
     });
   } else {
     store.set({ ui: { status: 'starting', detail: 'opening the DevTools window…' } });
-    ui = spawnDetached({
-      ...uiCommand(),
-      cwd: ROOT,
-      onStderr: (note) => run === generation && store.set({ note }),
-      onError: (detail) => {
-        ui = null;
-        if (run === generation) store.set({ ui: { status: 'failed', detail } });
-      },
-      onExit: (detail) => {
-        ui = null;
-        if (run === generation) store.set({ ui: { status: 'exited', detail } });
-      },
-    });
+    spawnUi(uiRun);
 
-    const ready = await waitForPort(run);
-    if (run !== generation) return;
+    const ready = await waitForPort(uiRun);
+    if (uiRun !== uiGeneration) return;
     if (!ready) {
       // Either it never started — in which case its own status already says
       // so — or it is up and not listening, which is worth saying.
@@ -161,25 +213,83 @@ export async function start(): Promise<void> {
     args: RUN.args,
     cwd: ROOT,
     env: { REACT_X11_DEVTOOLS: '1' },
-    onStderr: (note) => run === generation && store.set({ note }),
+    onStderr: (note) => appRun === appGeneration && store.set({ note }),
     onError: (detail) => {
       app = null;
-      if (run === generation) store.set({ app: { status: 'failed', detail } });
+      if (appRun === appGeneration) store.set({ app: { status: 'failed', detail } });
     },
     onExit: (detail) => {
       app = null;
-      if (run === generation) store.set({ app: { status: 'exited', detail } });
+      if (appRun === appGeneration) store.set({ app: { status: 'exited', detail } });
     },
   });
-  if (run !== generation) return;
+  if (appRun !== appGeneration) return;
   store.set({
     app: { status: 'running', detail: `pid ${app.pid} — REACT_X11_DEVTOOLS=1` },
   });
 }
 
+/**
+ * The DevTools window again, without touching the app.
+ *
+ * Selecting a component in the tree can take the standalone's renderer down
+ * (SIGTRAP, a second or two later; deterministic with ⚙ → Components →
+ * "always parse hook names for the selected element" on, and a coin flip
+ * with it off). Electron leaves an empty window behind and the tree, the
+ * props panel and the connection go with it.
+ *
+ * The app survives that, and react-devtools-core's backend retries its
+ * connection on a timer — so the recovery is to restart *this* half and wait
+ * a couple of seconds, and the thing not to do is stop the demo and start it
+ * again, which throws away the state the audience was just looking at.
+ */
+export async function restartUi(): Promise<void> {
+  const run = ++uiGeneration;
+  const owned = ui !== null;
+  killGroup(ui);
+  ui = null;
+  store.set({
+    note: '',
+    ui: { status: 'starting', detail: 'restarting the DevTools window…' },
+  });
+
+  if (owned) {
+    await waitForPortFree(run);
+  } else if (await probe()) {
+    // Not ours and still up — the presenter's own `npx react-devtools`. A
+    // second one cannot bind the port, and this one is what the app is
+    // talking to; ours is not the process to restart.
+    store.set({
+      ui: {
+        status: 'running',
+        detail: `already listening on ${HOST}:${PORT} — started outside the deck`,
+      },
+    });
+    return;
+  }
+  if (run !== uiGeneration) return;
+
+  spawnUi(run);
+  const ready = await waitForPort(run);
+  if (run !== uiGeneration) return;
+  if (!ready) {
+    if (!['failed', 'exited'].includes(store.get().ui.status)) {
+      store.set({ ui: { status: 'failed', detail: `no listener on ${HOST}:${PORT}` } });
+    }
+    return;
+  }
+  store.set({
+    ui: {
+      status: 'running',
+      detail: `listening on ${HOST}:${PORT} — the app reconnects on its own`,
+    },
+  });
+}
+
 /** Both of them down, and the slide back to where it started. */
 export function stop(): void {
-  generation++;
+  uiGeneration++;
+  appGeneration++;
   killGroup(app);
   killGroup(ui);
   app = null;

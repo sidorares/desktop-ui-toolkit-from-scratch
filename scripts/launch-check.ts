@@ -1,7 +1,11 @@
 // Does a launcher actually start its child under the runtime running this?
 // Starts each one, waits, prints the state the panel would show, stops it.
 import * as charts from '../src/chartsdemo.js';
-import { COMMANDS as DEVTOOLS } from '../src/devtools.js';
+import {
+  COMMANDS as DEVTOOLS,
+  missing as devtoolsMissing,
+} from '../src/devtools.js';
+import { backendRemedy } from '../src/devtools-backend.js';
 import * as hot from '../src/hotreload.js';
 import { RUNTIME, runOnNode, runScript } from '../src/runtime.js';
 
@@ -50,6 +54,18 @@ for (const [label, spawn] of [
   console.log(`  ${label} ${bin} ${args.join(' ')}`);
 }
 console.log(`  on slides  ${charts.COMMAND}  |  ${DEVTOOLS[1]}  |  ${hot.COMMAND}`);
+console.log('');
+
+// The DevTools demo has a third way to fail that a spawn cannot show: react-x11
+// imports the bridge lazily and only warns, so a checkout without it runs the
+// demo with no bridge at all. The launcher preflights for that; so does this.
+const absent = devtoolsMissing();
+if (absent.length) bad++;
+console.log(
+  absent.length
+    ? `FAIL  devtools bridge  ${backendRemedy(absent)}`
+    : 'ok    devtools bridge  react-devtools-core and ws resolve',
+);
 console.log('');
 await probe('charts', charts);
 await probe('hot-reload', hot);
