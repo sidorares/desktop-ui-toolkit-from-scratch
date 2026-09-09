@@ -34,6 +34,7 @@ panel like any other launcher.
 
 ```bash
 npm run check:launchers   # what each one resolves to, and whether it starts
+npm run check:menu        # the desktop slide's menu still drives the deck
 ```
 
 On macOS this runs on react-x11's native Cocoa backend, which is the one to
@@ -58,6 +59,11 @@ npm run x11
 | `r` | re-read `slides/` from disk (saves reload on their own) |
 | point at the progress line | the slide under the pointer |
 | click the progress line | go to that slide |
+
+While the desktop-integration slide is up, the desktop's own menu carries
+`Slide` and `Deck` menus running the same verbs — on macOS in the real menu
+bar, in a status item, and behind a right-click on the Dock icon. They leave
+with the slide.
 | `p` | start the **pacemaker**, then pause / resume it |
 | `P` | reset the pacemaker to zero |
 | `⌘+` `⌘-` | **bigger** / **smaller** — `Ctrl` too, for a Linux desktop |
@@ -264,6 +270,7 @@ shell one-liner keep its quotes and its pipe.
 | `<Scenes>` | `panel=` a live map, or a GL scene beside its own source |
 | `<SourceCode>` | a file off disk, highlighted — the demo's own, usually |
 | `<Booking>` | a flight booking that reads the desktop's calendar |
+| `<Desktop>` | one menu array, mounted into every system surface the machine has |
 
 `<DataViz>` and `<Scenes>` are five of slide 19's seven steps, one `panel`
 each; `<Booking>` is slide 20. Between them the showcase is every component
@@ -281,6 +288,26 @@ calendar events as a **prop**: on the slide that is a fixture, in an
 application it is `useDesktopCalendarEvents().events`, and since the
 integration arrives through `<Calendar dayContent>` the grid cannot tell the
 difference — so the demo needs no calendar service configured in the room.
+
+`<Desktop>` is `<Booking>`'s other half — the desktop written to rather than
+read from — and it is the one demo that is **not in the window at all**. It
+builds one `MenuBar` item array and hands it to `<MenuBar>`, `useDockMenu`
+and `useTray` together, so on macOS the same array becomes the real menu bar,
+the Dock icon's menu and a status item; on a desktop running a dbusmenu
+registrar it is exported over D-Bus; and on one running neither, `<MenuBar>`
+draws it inside the panel, which is the fallback arriving where the room is
+already looking. The panel beside it prints what actually happened —
+`onGlobalMenuChange`, `useTray().available`, `useNotifier().backend`,
+`useScreens().available` — rather than what platform this is.
+
+The items have to *work*, or the demo is a picture of a menu. That is what
+[`src/nav.tsx`](src/nav.tsx) is for: `<Scrubber onSeek>` gets the deck's
+navigation as a prop because `<Deck>` renders it directly, and a component
+named in a slide's markdown cannot be handed anything. So the deck publishes
+`go`, `next`, `prev`, `toggleFullscreen` and `reload` as a context — the same
+verbs the key map already runs, handed over rather than reimplemented — and
+picking **Slide → Next slide** from a menu this application never drew
+advances the talk.
 
 Components read `useStep()`, so one of them can be both halves of a point:
 `<Charts revealAt={1} />` shows eleven quiet years, then rescales its axis

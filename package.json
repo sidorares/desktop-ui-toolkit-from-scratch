@@ -22,7 +22,8 @@
     "check:pace": "tsx scripts/pace-check.ts",
     "start:bun": "bun src/main.tsx",
     "check:launchers": "tsx scripts/launch-check.ts",
-    "check:scrub": "tsx scripts/scrub-check.tsx"
+    "check:scrub": "tsx scripts/scrub-check.tsx",
+    "check:menu": "tsx scripts/menu-check.tsx"
   },
   "dependencies": {
     "@lydell/node-pty": "^1.1.0",

@@ -2,7 +2,7 @@
 
 Companion to [narration.md](narration.md), which is the spoken script.
 
-**38 slides, 131 steps, 40-minute slot.** This file was a proposal against a
+**41 slides, 145 steps, 40-minute slot.** This file was a proposal against a
 24-slide deck; PRs #1 and #2 then landed eight demo slides, so most of the
 original reordering argument is obsolete and has been dropped rather than
 forced onto a deck that had already moved. What survived, what was added, and
@@ -38,6 +38,39 @@ and it is worth a sentence on stage.
 | **V — performance** | 27–30 | **how** is it fast, and what transfers to my job? |
 | **VI — what it cost** | 31–36 | **what** did it take, honestly? |
 | Close | 37 | |
+
+## The desktop-integration slide — 23
+
+Added after the calendar, and deliberately as its pair: **22 is the desktop
+being read from, 23 is writing to it.** Slide 12 said belonging is a dozen
+protocols you have to speak and never showed one as an API; `createRoot()`
+(19) paid off three of them as default arguments; nothing said *here is the
+one-line hook, and here is where it does nothing.*
+
+Four steps under `reveal: replace`:
+
+| | |
+| --- | --- |
+| 1 | the inventory — seven surfaces outside your own windows, one hook each, and the point that every one is **declared rather than pushed** |
+| 2 | **one array, three destinations.** `MenuBar`'s items *are* dbusmenu's vocabulary, so the same array reaches a D-Bus registrar, `setMainMenu`, or the drawn bar — and the app branches on `exported`, never on the platform |
+| 3 | where it is empty, which is what makes the rest believable: the tray is the most Linux-shaped thing on the list and react-x11 has it **only on macOS** (#353); the badge is the mirror image, so this deck's own `23 / 41` shows nothing on Linux |
+| 4 | `<Desktop />`, live |
+
+The demo mounts `<MenuBar>`, `useDockMenu` and `useTray` from one array, so
+on the presenting machine the menu is in the **real macOS menu bar**, a
+status item and the Dock icon at once — and picking *Slide → Next slide*
+from there advances the talk. That needed a seam: `src/nav.tsx`, the deck's
+own navigation verbs as a context, because a component named in markdown
+cannot be handed props. `src/main.tsx` now passes `cocoa.appName`, without
+which the menu the room is asked to look at is called **node**.
+
+The panel does **not** grow into the slide, which is the one place it departs
+from `panel.tsx`'s rule. Six status rows stretched down a slide read as a
+table with the middle missing.
+
+**It costs three minutes the deck did not have** — see [Timing](#timing--the-honest-version).
+The cut ladder below is where that comes from; this slide is a better three
+minutes than the four-budgets slide, but that is a decision, not a fact.
 
 ## What was added this round
 
@@ -188,7 +221,8 @@ per-file key gets silently wrong.
 
 ## Timing — the honest version
 
-The acts add up to **47 minutes**, which does not fit a 40-minute slot.
+The acts add up to **50 minutes** with slide 23 in them, which does not fit a
+40-minute slot.
 [narration.md](narration.md) ends with a five-step cut ladder that lands 39
 minutes with the spine intact; deciding those cuts now beats discovering them
 at minute 35. In order: three showcase steps, the atoms slide, the wire-events
@@ -207,9 +241,13 @@ smoke guard is what makes safe.
 
 1. **`<Metric>` is used by no slide.** If any single number goes back on
    screen, that is what it is for.
-2. **Act markers.** Seven acts across 37 slides is a lot to hold without
+2. **Act markers.** Seven acts across 41 slides is a lot to hold without
    signposting; cheapest is the act name in the existing footer beside the step
    counter.
-3. **Timing.** 37 slides in 40 minutes is tight even speed-running 04–06.
-   The cut ladder: slide 28 (four budgets) folds into 08; slide 27 (the loop)
-   folds into 34.
+3. **Timing.** 41 slides in 40 minutes is tight even speed-running 04–06.
+   The cut ladder: slide 32 (four budgets) folds into 08; slide 28 (the loop)
+   folds into 35.
+4. **Slide numbers in this file and in `README.md` had already drifted** — both
+   were written against earlier orderings and neither agrees with the
+   filenames. Inserting 23 did not cause that and has not fixed it; the counts
+   above are the real ones, the cross-references are not.

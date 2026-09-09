@@ -55,6 +55,7 @@ import {
   toggle as paceToggle,
 } from './pacemaker.js';
 import { Scrubber } from './scrubber.js';
+import { NavProvider } from './nav.js';
 import { StepProvider } from './steps.js';
 import {
   ZOOM_DEFAULT,
@@ -277,6 +278,26 @@ export function Deck({
     [step, slide],
   );
 
+  // The deck, as a demo may drive it — see `nav.tsx`. The titles are here so
+  // a menu can offer the slides by name rather than by number; everything
+  // else is the key map's own verbs, handed over rather than reimplemented,
+  // which is what stops a menu item and the arrow key it duplicates from
+  // drifting apart.
+  const navState = useMemo(
+    () => ({
+      index,
+      total: slides.length,
+      titles: slides.map((s) => s.title),
+      go: (to: number) => go(to),
+      next: () => go(index + 1),
+      prev: () => go(index - 1),
+      fullscreen,
+      toggleFullscreen: () => setFullscreen((f) => !f),
+      reload: () => onReload?.(),
+    }),
+    [index, slides, go, fullscreen, onReload],
+  );
+
   const zoom = useMemo(() => zoomOf(zoomLevel), [zoomLevel]);
   const { px } = zoom;
   // A new object per render would re-resolve the palette and rebuild every
@@ -333,14 +354,16 @@ export function Deck({
                 slide.layout === 'title' ? 'center' : 'flex-start',
             }}
           >
-            <StepProvider value={stepState}>
-              <Prose
-                key={`${slide.id}:${step}`}
-                source={slide.chunks[step] ?? ''}
-                fontSize={px(slide.layout === 'title' ? 26 : 22)}
-                grow={slide.layout !== 'title'}
-              />
-            </StepProvider>
+            <NavProvider value={navState}>
+              <StepProvider value={stepState}>
+                <Prose
+                  key={`${slide.id}:${step}`}
+                  source={slide.chunks[step] ?? ''}
+                  fontSize={px(slide.layout === 'title' ? 26 : 22)}
+                  grow={slide.layout !== 'title'}
+                />
+              </StepProvider>
+            </NavProvider>
           </box>
 
           <box

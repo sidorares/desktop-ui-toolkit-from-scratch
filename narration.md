@@ -617,7 +617,73 @@ token that is worth stealing.
 *[That is the strongest argument for desktop integration in the talk. Let it
 sit for a second.]*
 
-## 23 · Your tooling still works
+## 23 · Everything outside your own window
+
+*[Four steps, `reveal: replace`, so arrow DOWN. The pair with 22 is the frame
+— say it in the first sentence or this reads as a feature list.]*
+
+That was the desktop being **read** from. This is the other direction —
+writing to it — and it is the half a browser tab has no expression for at
+all.
+
+*[Do not read the table. Read the last line.]* Every one of those is
+**declared, not pushed**: a value a component holds while it is mounted,
+cleared on the way out. There is no `clearBadge()` for anybody to forget —
+which is the same argument `useKeepAwake` made on the browser slide, arriving
+for six more surfaces.
+
+*[step]* **One array, three destinations,** and this is the best forty-five
+seconds on the slide. `MenuBar`'s items **are** `com.canonical.dbusmenu`'s
+vocabulary — the types say so in as many words, because the alternative was a
+second authoring model. So the same array reaches a D-Bus registrar on
+Plasma, `setMainMenu` on macOS, or nobody at all on stock GNOME, in which
+case `<MenuBar>` draws it itself.
+
+And the application branches on **the answer**, never on the platform:
+`if (exported) return null`.
+
+*[If asked why not GTK's `org.gtk.Menus` as well: traffic flows towards
+dbusmenu, not away from it. Plasma ships a proxy that converts GTK menus INTO
+dbusmenu, so a second exporter is double the work for no new consumer.]*
+
+*[step]* **And where it is empty** — which is the step that makes the other
+three believable. The interesting rows are the missing ones, and they are not
+the ones you would guess.
+
+The tray is the most Linux-shaped thing on that list, and react-x11 has it
+**only on macOS**. The badge is the mirror image: a Dock tile takes any
+label, the freedesktop protocol underneath a Linux launcher carries a *count*
+and has no text field — so the `23 / 41` this deck has been showing you all
+talk appears **nowhere** on a Linux desktop. Silently, and by design.
+
+That is what makes a hook safe to write unconditionally, and it is why
+nothing in the first table needed an `if (platform === …)` around it.
+
+*[step]* **Live.** The menu has been installed since this slide came up.
+
+*[In fullscreen the macOS menu bar is hidden until the pointer reaches the top
+edge — use that.]* Watch the top of the screen. *[Move the pointer up.]*
+`Slide` and `Deck`, in the desktop's own bar, above a fullscreen window. The
+same items are in the status item beside the clock, and behind a right-click
+on the Dock icon. Three system menus, one array, and none of them is drawn by
+this application.
+
+*[Then finish by picking **Slide → Next slide from the desktop's menu.** The
+talk advances, and the menu, the status item and the Dock menu all leave with
+the slide — which is the unmount half of step 1, demonstrated by walking away
+from it.]*
+
+*[CAVEATS. The notification row says osascript rather than cocoa and that is
+correct — `UNUserNotificationCenter` wants a bundle identifier and an
+unbundled process has none, so the ladder falls to the next rung and posts
+anyway. Do Not Disturb may eat the banner in fullscreen; the panel reports
+the rung either way, so say so and move on rather than debugging it. On a
+Linux machine the bar draws inside the panel and the first row says so, and
+the tray row goes grey — both of those are the slide working.]*
+
+*[If behind: steps 1 and 4 carry the claim.]*
+
+## 24 · Your tooling still works
 
 *[Section opener for the next two slides. Deliberately short — they do the
 showing.]*
@@ -642,7 +708,7 @@ If it is flaky, describe it; the line lands either way.]*
 
 *[step]* DevTools and Fast Refresh are the next two slides, running.
 
-## 24 · The debugger that ships with React
+## 25 · The debugger that ships with React
 
 *[DEMO, 2–3 min. Press the button FIRST and keep talking — the UI takes a few
 seconds, then the app window appears with the bridge on.]*
@@ -668,7 +734,7 @@ outline itself, once a second.
 *[If it does not come up, the panel says which half failed. Move on — the next
 slide is the one that gets the reaction.]*
 
-## 25 · Fast Refresh, on a window the desktop owns
+## 26 · Fast Refresh, on a window the desktop owns
 
 *[DEMO, 2 min, and the one to rehearse. Start it, click "count me" a few
 times, type something into the field, THEN press the edit button.]*
@@ -695,7 +761,7 @@ cycles three variants and the third press restores the file.]*
 
 # Under the hood — 4:30
 
-## 26 · The ecosystem
+## 27 · The ecosystem
 
 *[Drag a node if the room is warm — it is a real graph, not a picture.]*
 
@@ -723,7 +789,7 @@ base64-inlined WebAssembly, so there is no toolchain and no `node-gyp`.
 `node-x11-dri` is optional, and only if you want OpenGL. And one of them is a
 decision I will have to defend later.
 
-## 27 · What happens when state changes
+## 28 · What happens when state changes
 
 *[Walk it top to bottom, once, slowly.]*
 
@@ -744,7 +810,7 @@ the wire.
 **Paint sends the smallest rectangle that changed.** A cursor blink in a
 terminal is one cell, not one screen.
 
-## 28 · React's render phase is discardable
+## 29 · React's render phase is discardable
 
 Now my favourite bug, because it is a bug you can only have if your host is a
 protocol.
@@ -782,7 +848,7 @@ advice.
 
 # Make it fast — 6:00
 
-## 29 · Four budgets, and they fight
+## 30 · Four budgets, and they fight
 
 Performance here is not one number, it is four, and they trade against each
 other — which is unusual, and is what makes it interesting.
@@ -799,7 +865,7 @@ a round trip to set up.
 There is no single dial. There is a budget you are currently failing, and you
 go and find out which one.
 
-## 30 · Text is uploaded once, then referenced
+## 31 · Text is uploaded once, then referenced
 
 The prettiest mechanism in the whole thing, because it is the one that makes
 all four budgets happy at once.
@@ -823,7 +889,7 @@ rectangle — a run of them is hundreds of filled rectangles in one request.
 That is how a terminal draws every cell background on screen in a single call.
 The text-drawing path turned out to be the fastest rectangle-drawing path.
 
-## 31 · Every real optimisation was "don't"
+## 32 · Every real optimisation was "don't"
 
 The part that transfers even if none of you ever write an X11 client. I went
 back through everything I actually did to make this fast, and there was not
@@ -839,7 +905,7 @@ glyph sets, and geometry in a server-side display list.
 *[step]* The terminal got **three times faster on macOS by drawing less
 often.** Not by drawing faster. I did not change a single drawing call.
 
-## 32 · Two of the four, running
+## 33 · Two of the four, running
 
 *[DEMO SLIDE. 3 min, hard stop. `reveal: replace`. Stop both before moving
 on.]*
@@ -872,7 +938,7 @@ than showing them twice.]*
 
 # What it cost — 5:00
 
-## 33 · Then macOS happened
+## 34 · Then macOS happened
 
 Now the honest part, and the decision I said I would have to defend.
 
@@ -903,7 +969,7 @@ place.
 
 *[Beat: this deck is running on that backend right now.]*
 
-## 34 · Do we still need X11?
+## 35 · Do we still need X11?
 
 Mostly, **no**. Wayland is where the Linux desktop went, and I am not going to
 stand here and pretend otherwise.
@@ -947,7 +1013,7 @@ that is the question you wanted.]*
 deliberately, with the whole toolkit above it unchanged? That was the entire
 argument.
 
-## 35 · The loop
+## 36 · The loop
 
 One thing about how this gets built, because I think it is what made the API
 coherent.
@@ -968,7 +1034,7 @@ the things an app does *outside* its own windows — like notifications and the
 tray — and the macOS side of that can only be reached from core. The migration
 was two import lines.
 
-## 36 · The dates
+## 37 · The dates
 
 *[Read the first three at normal pace.]* node-x11, 2011. ntk, 2012. react-x11,
 2015 — and then essentially nothing for eleven years.
@@ -977,7 +1043,7 @@ was two import lines.
 
 That is seven weeks.
 
-## 37 · The same seven weeks, by volume
+## 38 · The same seven weeks, by volume
 
 *[Same story, counted instead of dated. Say "it sat there for eleven years"
 and nothing else — do NOT re-land "seven weeks", the last slide already did
@@ -985,7 +1051,7 @@ and saying it twice spends the pause you took for it.]*
 
 *[step — the axis rescales under the last bar. Say nothing. Wait.]*
 
-## 38 · So: AI-assisted development
+## 39 · So: AI-assisted development
 
 I want to be careful about how I say this, because the honest version is more
 interesting than the marketing one.
@@ -1015,7 +1081,7 @@ typist.
 
 # Close — 1:30
 
-## 39 · What's next for react-x11
+## 40 · What's next for react-x11
 
 The list is not "features I have not built yet" any more. It is the work that
 only real use produces.
@@ -1054,7 +1120,7 @@ usually what produces one.]*
 
 *[step]* All of it is on GitHub, and the good first issues are real ones.
 
-## 40 · It's all just bytes on a socket
+## 41 · It's all just bytes on a socket
 
 So — the idea I wanted to leave you with.
 
@@ -1090,14 +1156,15 @@ pauses it for a question.
 | The wire | 03–11 | 9:00 |
 | Why build one | 12–16 | 7:00 |
 | React, without a DOM | 17–20 | 6:00 |
-| What's in the box | 21–25 | 7:00 |
-| Under the hood | 26–28 | 4:30 |
-| Make it fast | 29–32 | 6:00 |
-| What it cost | 33–37 | 5:00 |
-| Close | 38–39 | 1:30 |
+| What's in the box | 21–26 | 10:00 |
+| Under the hood | 27–29 | 4:30 |
+| Make it fast | 30–33 | 6:00 |
+| What it cost | 34–38 | 5:00 |
+| Close | 39–40 | 1:30 |
 
-**48:30.** That does not fit, and the honest thing is to decide the cuts
-now rather than discover them at minute 35. In order:
+**51:30**, three of which are slide 23. That does not fit, and the honest
+thing is to decide the cuts now rather than discover them at minute 35. In
+order:
 
 1. **Showcase steps 2, 3 and 4** (−2:00). The notes already say cut to 1, 5
    and 6.
@@ -1105,13 +1172,22 @@ now rather than discover them at minute 35. In order:
    onto slide 12, which makes the same argument.
 3. **Slide 10, wire events** (−1:00). 09 and 11 carry the wire; the event mask
    is a sentence on 09.
-4. **Slide 29, four budgets** (−1:30). Slide 31 names all four in its bullets
+4. **Slide 30, four budgets** (−1:30). Slide 32 names all four in its bullets
    already; the "they fight" trade-off becomes its first step.
-5. **Slide 25, Fast Refresh** (−2:00). The most painful cut on the list, and
+5. **Slide 26, Fast Refresh** (−2:00). The most painful cut on the list, and
    still the right one if you are at minute 30 with nine slides left.
+6. **Slide 23 down to steps 1 and 4** (−1:30). Its own notes say which two:
+   the inventory and the live menu carry the claim, and *one array, three
+   destinations* and *where it is empty* are what people ask about
+   afterwards.
 
-That lands **40:30** with 1–5 applied, and 39 minutes if the showcase goes to
-three steps rather than four.
+That lands **42:00** with 1–6 applied — **which is still two minutes over,
+and that is the true cost of slide 23.** The last two minutes have to come
+from somewhere this ladder does not reach, so decide before the day: the
+coherent candidates are **slide 13** (the landscape, folded into 12's table)
+and **slide 15** (what a binding gives and takes, folded into 14). Neither is
+free. The alternative is to run slide 23 as a two-step slide permanently, in
+which case the ladder lands 40:30 the way it did before it was added.
 
 **Slide 16 is not on this list.** It is the hinge the three slides before it
 exist to reach, and cutting it turns the whole act into a survey with no

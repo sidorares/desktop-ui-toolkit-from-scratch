@@ -1,0 +1,138 @@
+---
+title: Everything outside your own window
+reveal: replace
+notes: |
+  DESKTOP INTEGRATION — 3 min, four steps, `reveal: replace`, so arrow DOWN
+  between them and each beat gets a clean slide.
+
+  The pair with 22 is the frame: that slide was the desktop being READ from,
+  this one is writing to it. Say that in the first sentence — it is what stops
+  this reading as a feature list.
+
+  1 — the inventory. Do not read the table; read the LAST line. "Declared,
+      not pushed" is the thing that generalises: every one of these is a value
+      a component holds while it is mounted, and none of them has a
+      take-it-down call for anyone to forget. That is the same argument as
+      `useKeepAwake` on the browser slide, arriving for six more surfaces.
+  2 — the slide's one new idea, and the best 45 seconds on it. `MenuBar`'s
+      items ARE dbusmenu's vocabulary — the types say so in as many words —
+      so one array reaches three completely different places and the app
+      picks none of them. Land the `if (exported) return null` beat: the
+      branch is on whether the desktop TOOK it, never on which desktop it is.
+      If someone asks why not GTK's `org.gtk.Menus` too: traffic flows
+      towards dbusmenu, not away from it — Plasma ships a proxy that converts
+      GTK menus INTO dbusmenu, so a second exporter is double the work for no
+      new consumer.
+  3 — the honest step, and the one that makes the other three believable.
+      Lead with the inversion, because nobody expects it: the tray is the most
+      Linux-shaped thing on the list and react-x11 has it only on macOS. Then
+      the badge as its mirror image — which means the badge THIS DECK is
+      showing you is invisible on the machine most of the room would run it
+      on, silently, and that is the designed behaviour rather than a bug.
+  4 — THE DEMO, and the close. The menu has been installed since the slide
+      mounted.
+
+      **In fullscreen the macOS menu bar is hidden until the pointer reaches
+      the top edge — use that.** Say "watch the top of the screen", then move
+      the pointer up. `Slide` and `Deck` are there, in the desktop's own bar,
+      above a fullscreen window. The status item is beside the clock showing
+      the same `23 / 41`, and a right-click on the Dock icon has the same
+      items again: three system menus, one array.
+
+      Then finish by picking **Slide → Next slide from the desktop's menu.**
+      The talk advances, and the menu, the tray item and the Dock menu all
+      leave with the slide. That is the unmount half of step 1, demonstrated
+      by walking away from it.
+
+  CAVEATS, both worth knowing before the room finds them:
+   - the app menu prints what `cocoa.appName` says for an unbundled process,
+     which `main.tsx` now sets. Without it that menu is called **node**.
+   - the notification row says **osascript**, not cocoa, and that is correct:
+     `UNUserNotificationCenter` wants a bundle identifier and an unbundled
+     `tsx` process has none, so the ladder falls to the next rung and posts
+     the banner anyway. If anyone asks, that is the ladder working — and it
+     is the same shape as the file dialog's and the eyedropper's.
+   - macOS also suppresses banners while a fullscreen app is frontmost under
+     some Do Not Disturb settings. The panel reports which rung answered
+     either way, so if no banner appears, say "the rung answered, Do Not
+     Disturb ate the banner" and move on. Do not debug it on stage.
+   - on a Linux desktop with no registrar the bar draws INSIDE the panel and
+     the first row says so, which is the "and where none does" branch showing
+     up where the room is already looking. The tray row goes grey. Both are
+     the slide working.
+
+  If behind schedule: steps 1 and 4. The inventory and the live menu carry
+  the claim; 2 and 3 are what people ask about afterwards.
+---
+
+# The other half of belonging
+
+The calendar was the desktop being **read** from. This is writing to it — and
+it is the half a browser tab has no expression for at all.
+
+| what the user sees | what you write |
+| --- | --- |
+| a count on the app icon | `useBadge(value)` |
+| an icon in the tray, with a menu | `useTray({ icon, menu, onClick })` |
+| the Dock icon's own menu | `useDockMenu(items)` |
+| your menu, in the desktop's panel | `<MenuBar menus={…} />` |
+| a banner that outlives every window | `useNotifier()` |
+| "look at me" | `states={['demands_attention']}` |
+| where a window may actually go | `useScreens().primary.available` |
+
+Every one of them is **declared, not pushed** — a value a component holds
+while it is mounted, cleared on the way out. There is no `clearBadge()` for
+anybody to forget.
+
+^^^
+
+# One array, three destinations
+
+`MenuBar`'s items are `com.canonical.dbusmenu`'s vocabulary. Not by
+coincidence — **by design**, so that there is no second authoring model:
+
+```jsx
+const menus = [{ label: 'Slide', items: [
+  { label: 'Next slide', onSelect: nav.next },
+] }];
+```
+
+| the desktop | what becomes of that array |
+| --- | --- |
+| Plasma · Unity · `vala-panel-appmenu` | a registrar answers → exported over D-Bus |
+| macOS | the same snapshot → `setMainMenu`. The real menu bar |
+| stock GNOME | nobody owns the name → `<MenuBar>` draws it itself |
+
+On macOS that one builder also fills the Dock menu and the tray's menu. And
+the app branches on **the answer**, never on the platform:
+
+```jsx
+const exported = useGlobalMenu(menus);
+if (exported) return null;
+```
+
+^^^
+
+# …and where it is empty
+
+The interesting rows are the missing ones, and they are not the ones you would
+guess:
+
+- **The tray is the most Linux-shaped thing on that list, and react-x11 has it
+  only on macOS.** `useTray().available` is `false` on X11 — #353 is open
+- **The badge is the mirror image.** A Dock tile takes any label; the
+  freedesktop protocol underneath a Linux launcher carries a *count* and has
+  no text field at all. So the `23 / 41` this deck is showing you appears
+  **nowhere** on a Linux desktop — silently, and by design
+- **`available` is an approximation, and says so.** `_NET_WORKAREA` is
+  published for the whole virtual desktop, so per-monitor is a per-axis bound
+
+A hook that quietly does nothing where the desktop has nothing is what makes
+it safe to write unconditionally — which is why nothing in the first table
+needed an `if (platform === …)` around it.
+
+^^^
+
+# Live
+
+<Desktop />

@@ -69,5 +69,13 @@ function App({ initial }: { initial: Slide[] }): ReactElement {
 }
 
 const initial = await loadSlides(SLIDES_DIR);
-const root = await createRoot();
+// `cocoa.appName` is what the Dock, ⌘-Tab and the **app menu** print for an
+// unbundled process: LaunchServices registers `tsx` under its executable, so
+// without this the menu the desktop-integration slide asks the room to look
+// at is called `node`. A bundle's Info.plist wins and the bridge leaves it
+// alone, so this is inert everywhere it is not needed — including on X11,
+// where there is no such record to rename.
+const root = await createRoot({
+  cocoa: { appName: 'Desktop UI Toolkit' },
+});
 root.render(<App initial={initial} />);
