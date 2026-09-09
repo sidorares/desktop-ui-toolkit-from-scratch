@@ -701,8 +701,13 @@ cycles three variants and the third press restores the file.]*
 
 This is what you would actually install. An arrow means "depends on".
 
-Down the spine: the workbench, the components package, react-x11, ntk,
-node-x11, and a socket. Out to the right, what react-x11 pulls in. And two
+Down the spine: the workbench, the components package, react-x11 — host
+config, style, layout, damage and paint — then ntk, node-x11, and a socket.
+
+*[If asked "doesn't yoga do the layout?": yoga owns the algorithm, react-x11
+owns the tree — a yoga node per element, the measure functions text nodes
+answer with, and the dirty propagation. Which is why the edge between them
+says `measure`.]* Out to the right, what react-x11 pulls in. And two
 dashed edges that are **not** dependencies — the visualizer sits *on* the wire
 when `DISPLAY` points at it, and react-devtools is joined by a websocket on
 port 8097 and nothing else.

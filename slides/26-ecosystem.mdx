@@ -3,6 +3,13 @@ layout: full
 title: The ecosystem
 notes: |
   Drag a node if the room is warm — it is a real graph, not a picture.
+  If someone asks "doesn't yoga do the layout?" — good question, and the
+  answer is on the edge between them. yoga owns the flexbox algorithm;
+  react-x11 owns the yoga *tree*: a node per element, the measure functions
+  text nodes answer with, and the dirty propagation that decides which
+  subtree gets recomputed. The edge says `measure` because that is the half
+  react-x11 supplies. Same shape as `damage`, which is the tree of
+  what-changed it keeps between commits so that paint has something to skip.
   Beat 1: the spine. Workbench on top, a socket at the bottom, and an arrow
   means "depends on". The two dashed headless edges are not dependencies:
   the visualizer sits ON the wire when DISPLAY points at it, and

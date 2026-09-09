@@ -28,6 +28,15 @@
 // middle, and cost more legibility than the loop was worth. It is a sentence
 // in the speaker notes and a phrase in the node's description instead.
 //
+// **`layout` on this node is not the same claim as yoga's `flexbox`.** react-x11 owns
+// a yoga node per element, the measure functions text nodes answer with, and
+// the dirty propagation that decides which subtree is recomputed; yoga owns
+// the algorithm that runs over it. Naming only one of the two invites the
+// obvious question — so yoga says `flexbox`, and the edge between them says
+// `measure`, which is the half react-x11 actually supplies. Same reason `damage` is on this node
+// and not on `paint`: the tree of what-changed is bookkeeping react-x11 keeps
+// between commits, and painting is what it is then able to skip.
+//
 // Every version and every edge here was read off `node_modules`, not
 // remembered: `x11` is `node-x11`'s package name, `x11-dri` is
 // `node-x11-dri`'s, and both arrive through `ntk` rather than through
@@ -91,16 +100,16 @@ interface Pkg {
 const PACKAGES: readonly Pkg[] = [
   { id: 'workbench', label: '@react-x11/workbench', description: 'stories · the dev loop', tier: 'js', x: 250, y: 0, width: 205 },
   { id: 'components', label: '@react-x11/components', description: 'charts · terminal · flow · markdown', tier: 'js', x: 250, y: 110, width: 245 },
-  { id: 'reactx11', label: 'react-x11', description: 'reconciler host · style · paint', tier: 'js', x: 250, y: 240, width: 210 },
+  { id: 'reactx11', label: 'react-x11', description: 'host config · style · layout · damage · paint', tier: 'js', x: 250, y: 240, width: 290 },
   { id: 'ntk', label: 'ntk', description: 'shaping · decode · XRender', tier: 'js', x: 250, y: 400, width: 195 },
   { id: 'nodex11', label: 'node-x11', description: 'the protocol, encoded in JS', tier: 'js', x: 250, y: 515, width: 195 },
   { id: 'xserver', label: 'X server', description: 'owns the pixels', tier: 'external', x: 250, y: 630, width: 165 },
 
   { id: 'reconciler', label: 'react-reconciler', description: "React's own host interface", tier: 'js', x: -20, y: 240, width: 200 },
 
-  { id: 'yoga', label: 'yoga-layout', description: 'flexbox · no toolchain needed', tier: 'wasm', x: 545, y: 175, width: 200 },
-  { id: 'dbus', label: 'dbus-native', description: 'appearance · a11y · menus', tier: 'js', x: 545, y: 265, width: 200 },
-  { id: 'appkit', label: '@windowkit/appkit', description: 'the macOS backend', tier: 'native', x: 545, y: 355, width: 200 },
+  { id: 'yoga', label: 'yoga-layout', description: 'flexbox · no toolchain needed', tier: 'wasm', x: 600, y: 175, width: 200 },
+  { id: 'dbus', label: 'dbus-native', description: 'appearance · a11y · menus', tier: 'js', x: 600, y: 265, width: 200 },
+  { id: 'appkit', label: '@windowkit/appkit', description: 'the macOS backend', tier: 'native', x: 600, y: 355, width: 200 },
   { id: 'dri', label: 'node-x11-dri', description: 'direct rendering, for GL', tier: 'native', x: 545, y: 500, width: 195 },
 
   { id: 'vis', label: 'x11-protocol-visualizer', description: 'on the wire · UI built with react-x11', tier: 'js', x: 545, y: 630, width: 235 },
@@ -113,7 +122,7 @@ const LINKS: readonly (FlowEdge & { optional?: boolean; wire?: boolean })[] = [
   { id: 'wb-comp', source: 'workbench', sourceHandle: 'b', target: 'components', targetHandle: 't' },
   { id: 'comp-rx', source: 'components', sourceHandle: 'b', target: 'reactx11', targetHandle: 't' },
   { id: 'rx-rec', source: 'reactx11', sourceHandle: 'l', target: 'reconciler', targetHandle: 'r' },
-  { id: 'rx-yoga', source: 'reactx11', sourceHandle: 'r', target: 'yoga', targetHandle: 'l' },
+  { id: 'rx-yoga', source: 'reactx11', sourceHandle: 'r', target: 'yoga', targetHandle: 'l', label: 'measure' },
   { id: 'rx-dbus', source: 'reactx11', sourceHandle: 'r', target: 'dbus', targetHandle: 'l', label: 'optional', optional: true },
   { id: 'rx-appkit', source: 'reactx11', sourceHandle: 'r', target: 'appkit', targetHandle: 'l', label: 'optional · macOS', optional: true },
   { id: 'rx-ntk', source: 'reactx11', sourceHandle: 'b', target: 'ntk', targetHandle: 't' },
