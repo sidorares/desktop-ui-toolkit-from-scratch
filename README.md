@@ -335,11 +335,13 @@ and the hundred megabytes of Electron behind it — stays a devDependency,
 since a machine without it falls back to `npx`. A DevTools already listening
 on 8097 is used as it stands rather than replaced.
 
-**Two things to know before giving that slide.** The demo raises
-`Error.stackTraceLimit`: React works out where each hook was called from by
-capturing a stack, V8 keeps ten frames, and `tsx` spends about ten of them,
-so without it the call site falls off the end and every hook comes up
-*unnamed* — on the slide whose whole point is looking at hooks. And
+**Two things to know before giving that slide.** The hooks have names
+because **react-x11 2.10.2** raises `Error.stackTraceLimit` when the bridge
+is enabled: React works out where each hook was called from by capturing a
+stack, V8 keeps ten frames, and `tsx` spends about ten of them, so before
+that fix the call site fell off the end and every hook came up *unnamed* —
+on the slide whose whole point is looking at hooks. Nothing here has to pass
+`--stack-trace-limit=50`, but an app on an older react-x11 does. And
 **selecting a component in the tree can kill the DevTools window.** It is
 deterministic with ⚙ → Components → "always parse hook names for the
 selected element" on and still a coin flip with it off, in the standalone

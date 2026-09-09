@@ -21,20 +21,15 @@ import { Button, createRoot } from 'react-x11';
 
 import { backendRemedy, missingBackend } from '../src/devtools-backend.js';
 
-// **Hook sources need more than ten stack frames.** React works out where a
-// hook was called from by capturing a stack, and V8 keeps ten frames by
-// default — `tsx` adds about ten of its own below every hook call, so the
-// call site falls off the end, the backend reports a `hookSource` of nulls,
-// and DevTools shows the hooks *unnamed* with `Hook source code location not
-// found.` in its console. On a slide whose whole point is "look at the props
-// and the hook state", that is the demo failing quietly.
-//
-// Set here rather than as `--stack-trace-limit=50` on the command line
-// because there are three ways this file gets run — the slide's button, `npm
-// run example:devtools`, and a presenter typing the line off the slide — and
-// only one of them goes through a launcher. Fifty is far more than the ten
-// frames `tsx` costs and still nothing next to what a stack capture is for.
-Error.stackTraceLimit = Math.max(Error.stackTraceLimit ?? 10, 50);
+// **Why the hooks here have names.** React works out where a hook was called
+// from by capturing a stack, and V8 keeps ten frames — fewer than a loader
+// leaves between the hook and its call site, and `tsx` costs about ten. So
+// under a loader the call site falls off the end, `hookSource` comes back
+// null, and DevTools shows the hooks *unnamed*, on a slide whose whole point
+// is looking at hooks. react-x11 2.10.2 raises `Error.stackTraceLimit` in
+// `prepare()` when the flag is set, so this file does not have to and nor
+// does the command line that started it — which is worth knowing, because
+// an app on an older react-x11 needs `--stack-trace-limit=50` itself.
 
 /** Whether this process was started the way the demo wants. Said on screen,
  *  because a window that looks fine while nothing is connected is the most

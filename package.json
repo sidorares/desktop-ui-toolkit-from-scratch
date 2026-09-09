@@ -2,7 +2,7 @@
   "name": "desktop-ui-toolkit-from-scratch",
   "version": "0.0.0",
   "private": true,
-  "description": "\"Making a Desktop UI Toolkit From Scratch\" \u2014 a talk about react-x11, presented in an app built with react-x11",
+  "description": "\"Making a Desktop UI Toolkit From Scratch\" — a talk about react-x11, presented in an app built with react-x11",
   "type": "module",
   "engines": {
     "node": ">=20.19"
@@ -29,7 +29,7 @@
     "@react-x11/components": "^0.7.1",
     "react": "^19.2.8",
     "react-devtools-core": "^7.0.1",
-    "react-x11": "^2.10.1",
+    "react-x11": "^2.10.2",
     "ws": "^8.21.3"
   },
   "devDependencies": {
