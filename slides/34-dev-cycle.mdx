@@ -21,5 +21,8 @@ two props.
 
 ^^^
 
-> The deck you are looking at found one this week: a markdown fence knows
-> its *language* but is never handed the rest of its info string.
+> It happened to this deck while I was writing it. The calendar you saw
+> earlier lived in the components package; between two `npm install`s it
+> moved into core — because reading the user's calendar is something an app
+> does *outside* its own windows, like the tray — and the migration was two
+> import lines.
