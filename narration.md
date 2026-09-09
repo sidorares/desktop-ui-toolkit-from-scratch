@@ -973,14 +973,42 @@ typist.
 
 ## 38 · What's next for react-x11
 
-Real things, not a wishlist. **MDX in `<Markdown>`** — components interleaved
-with prose; this deck is the forcing function. **More backends** — Wayland,
-and Windows, behind the same tree. **Accessibility** — AT-SPI is wired, the
-coverage is not finished, and this is the one I would most like help with. And
-**the workbench**, a Storybook for a desktop toolkit, which is how everything
-you saw on the showcase gets built.
+The list is not "features I have not built yet" any more. It is the work that
+only real use produces.
 
-*[step]* All of it is on GitHub and the good-first-issues are real ones.
+*[MDX shipped in components 0.6.0 — these slides ARE `.mdx` — and the
+workbench is out at 0.2.0 with 74 stories. Both used to be on this list. Do
+not read the old one.]*
+
+*[step]* **More backends** — Wayland, and Windows, behind the same node tree.
+The presenter seam held for Cocoa, so this is the third time rather than the
+first. **Finish the accessibility coverage** — AT-SPI is wired, the coverage
+is not, and this is the one I would most like help with. And **keep tweaking
+performance**, because there are four budgets and every new application fails
+a different one.
+
+*[step]* And the one that matters most: **real users.**
+
+The bug I actually need is one I did not predict. Everything on these slides
+is one person's taste, tested against one person's applications — and fifteen
+years of knowing exactly what I wanted is also fifteen years of my own blind
+spots.
+
+*[step]* So let me pay for that with a bug that has been on screen all
+evening.
+
+`<Markdown>` draws the rounded chip behind inline code by reading the span
+each laid-out run came from. react-x11's Cocoa text engine reports run
+geometry only — so on macOS the chips are skipped.
+
+**Every piece of inline code in this talk has been missing its background.**
+
+*[Point at a piece of inline code on this very slide. It is cosmetic, it is
+written down in the README, and admitting it out loud is worth more than the
+slide costs. If nobody has a question after the last slide, this beat is
+usually what produces one.]*
+
+*[step]* All of it is on GitHub, and the good first issues are real ones.
 
 ## 39 · It's all just bytes on a socket
 
