@@ -1,0 +1,44 @@
+---
+title: Your tooling still works
+notes: |
+  SECTION OPENER for the two demo slides after it — deliberately short now.
+  It used to list DevTools and Fast Refresh, which slides 22 and 23 then
+  demonstrated; saying a thing and then showing it is right, but saying it
+  twice and then showing it is not. So this slide is the WHY, and they are
+  the WHAT.
+  Alt-click-to-source is the one thing here with no demo of its own, so it
+  keeps its step. If the room is warm, do it live — have the editor open on
+  a second desktop. If it is flaky, describe it; the line lands either way.
+---
+
+# Your tooling still works
+
+^^^
+
+And the reason is the same one as everything else in this talk: **the tools
+speak protocols too.**
+
+- React DevTools does not know about the DOM. It talks to a backend over a
+  socket — which is how React Native does it
+- Fast Refresh needs a module boundary and a re-render, neither of which is a
+  browser thing
+- The JSX source location babel already puts on every element is just… there
+
+So a renderer with no DOM does not *implement* any of that. It **qualifies**
+for it.
+
+^^^
+
+Which includes one thing that was not free, and is my favourite:
+**alt-click any element on screen and your editor opens on the JSX line that
+drew it.**
+
+```
+REACT_X11_EDITOR=code npm start
+```
+
+A hit test, the source location, and spawning `$EDITOR`. About fifty lines.
+
+^^^
+
+DevTools and Fast Refresh are the next two slides, running.

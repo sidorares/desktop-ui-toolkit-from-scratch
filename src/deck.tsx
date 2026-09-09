@@ -48,6 +48,13 @@ import {
 
 import { Prose } from './prose.js';
 import { DECK_THEME } from './theme.js';
+import { actOf } from './acts.js';
+import {
+  PaceClock,
+  reset as paceReset,
+  toggle as paceToggle,
+} from './pacemaker.js';
+import { Scrubber } from './scrubber.js';
 import { StepProvider } from './steps.js';
 import {
   ZOOM_DEFAULT,
@@ -256,6 +263,11 @@ export function Deck({
       if (k === XK_ESCAPE) return setFullscreen(false), handled();
       if (ev.key === 'f') return setFullscreen((f) => !f), handled();
       if (ev.key === 'r') return onReload?.(), handled();
+      // The pacemaker. Lower case runs and pauses; upper case zeroes it, so
+      // a second rehearsal does not start twenty minutes in. Neither touches
+      // the slide, so both are safe to hit mid-sentence.
+      if (ev.key === 'p') return paceToggle(), handled();
+      if (ev.key === 'P') return paceReset(), handled();
     },
     [index, go, advance, retreat, slides.length, onReload],
   );
@@ -285,6 +297,7 @@ export function Deck({
   }
 
   const progress = slides.length > 1 ? index / (slides.length - 1) : 1;
+  const act = actOf(index);
 
   return (
     // The zoom provider goes *outside* the theme, not between it and the
@@ -343,24 +356,22 @@ export function Deck({
             <text style={{ fontSize: px(12), color: '$textMuted' }}>
               {`${index + 1} / ${slides.length}`}
             </text>
-            <box
-              style={{
-                flexGrow: 1,
-                height: px(2),
-                backgroundColor: '$border',
-                borderRadius: px(1),
-              }}
-            >
-              <box
-                style={{
-                  width: `${Math.round(progress * 100)}%`,
-                  height: px(2),
-                  backgroundColor: '$accent',
-                  borderRadius: px(1),
-                  transition: 200,
-                }}
-              />
-            </box>
+            {/* Two lines stacked and sharing a width — where the slides have
+                got to, and where the clock has — and both of them a control:
+                point at the track for the slide under the pointer, click to
+                go there. See `scrubber.tsx` and `pacemaker.tsx`. */}
+            <Scrubber slides={slides} index={index} onSeek={go} px={px} />
+            {/* The section, in words. A number says how much is left; the
+                name says what the room is currently being told, which is the
+                half a presenter cannot get from the progress bar and an
+                audience cannot get at all. Silent on the title slides at
+                either end — see `acts.ts`. */}
+            {act ? (
+              <text style={{ fontSize: px(12), color: '$textMuted' }}>
+                {act}
+              </text>
+            ) : null}
+            <PaceClock progress={progress} px={px} />
             {slide.steps > 1 ? (
               <text style={{ fontSize: px(12), color: '$textMuted' }}>
                 {`step ${step + 1}/${slide.steps}`}

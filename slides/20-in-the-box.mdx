@@ -1,0 +1,52 @@
+---
+title: What you actually write
+notes: |
+  The "is this a toy?" slide, and the narration's fix: lead with the GOAL,
+  then what the architecture FORCED, then admit the cost. A feature list
+  invites "so it's a CSS clone"; "there is no cascade, and this is what falls
+  out of that" does not.
+  Land the container-query inversion — in a desktop app the interesting size
+  is the pane, never the screen. That is the opposite of the web's history
+  and it is where a web developer stops translating.
+  The vocabulary list that used to close this slide is gone: the showcase slide
+  demonstrates the whole component set across seven steps, and listing it in
+  prose two slides earlier was saying it twice. Point forward instead.
+---
+
+# It reads like the web, because it should
+
+```jsx
+<box style={{
+  padding: 12,
+  backgroundColor: '$surface',
+  transition: 150,
+  ':hover': { backgroundColor: '$surfaceHover' },
+  '@container width >= 400': { flexDirection: 'column' },
+}}>
+```
+
+The goal was one sentence: **a web developer should be able to read this
+without translating.**
+
+^^^
+
+But there is no stylesheet here and no cascade — a style is an object on a
+node. So the architecture forced all of this:
+
+- **Pseudo-states live in the object**, because there is no selector to put
+  them in — and `:drag-over` / `:dragging` come free
+- **Container queries, not media queries.** The interesting size in a desktop
+  app is the pane, never the screen — so the container query is the primitive
+  and the window query is the special case. The opposite of the web's history
+- **Tokens, not variables.** `$surface` resolves against the theme, which came
+  from the desktop over the bus `createRoot` opened
+- **Transitions on any number or colour**, because animation belongs to the
+  value, not to a rule somewhere else
+
+^^^
+
+What you give up is real: no cascade, no selectors, no stylesheet you can ship
+separately.
+
+What you get is that **every style is a value in the tree** — which is why the
+whole thing can be diffed, and why a theme change is just a re-render.

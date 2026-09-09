@@ -1,0 +1,49 @@
+---
+title: The whole program
+notes: |
+  The slide the deck was missing: ten minutes about a toolkit and they have
+  not yet seen a program.
+  Beat 1 — that is the file, and `bun app.jsx` runs it. No bundler, no HTML,
+  no div, and no build step: bun transpiles the JSX on the way in, which is
+  what makes "no bundler" literally true rather than nearly true. (`node`
+  needs a loader for a .jsx file — `--import tsx`, which is what this deck
+  runs under.) And the last two lines are the bottom of this deck's own
+  src/main.tsx: say that out loud, it is not a simplified example.
+  Beat 2 — the window is IN the tree, and multi-window and popups fall out
+  of that for free rather than being separate APIs.
+  Next slide is what `createRoot()` had already done by then.
+---
+
+# Hello, desktop
+
+```jsx
+import { createRoot } from 'react-x11';
+
+const App = () => (
+  <window title="Hello" width={400} height={300}>
+    <text style={{ fontSize: 24, padding: 20 }}>Hello, desktop</text>
+  </window>
+);
+
+const root = await createRoot();
+root.render(<App />);
+```
+
+^^^
+
+That is the file. **`bun app.jsx`**, and there is a window on your screen. No
+bundler, no dev server, no `index.html` with a `div` in it to mount into — and
+no build step, because the JSX is transpiled on the way in.
+
+**Those last two lines are the bottom of this deck's own `src/main.tsx`** —
+not a simplified example, what is running.
+
+^^^
+
+And notice where the window is. **`<window>` is in the tree**: an element,
+with props, reconciled like everything else.
+
+- The title is a **prop** — put state in it and the titlebar updates
+- Two `<window>`s is a **multi-window app**. There is no second API
+- A `<popup>` is a window with different window-manager hints, so menus,
+  tooltips and dialogs are the same machinery

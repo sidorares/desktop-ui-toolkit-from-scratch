@@ -5,9 +5,13 @@ notes: |
   and owning that is more interesting than defending it.
   "No compiled modules" was never the goal. It was a *constraint* that made
   the design better, and it had a price I was eventually willing to pay.
+  The last line hands to the X11-vs-Wayland slide. Do not answer it here —
+  the next slide is the answer and it needs this one to have landed first.
 ---
 
 # Then macOS happened
+
+This is the decision I said I would have to defend.
 
 The same component tree, a different renderer underneath: Core Animation
 layers instead of X11 windows.
@@ -27,4 +31,5 @@ And the cost: the AppKit bridge is a **compiled module**.
 > "No binary modules" was never the goal. It was a constraint that kept the
 > design honest — and macOS was worth breaking it for.
 
-Wayland and Windows are the same shape of problem.
+Wayland and Windows are the same shape of problem — which raises the question
+somebody has been sitting on since slide three.

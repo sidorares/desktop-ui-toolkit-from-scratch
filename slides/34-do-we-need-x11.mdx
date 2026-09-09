@@ -1,0 +1,70 @@
+---
+title: Do we still need X11?
+notes: |
+  The question the room has been holding since slide 3, answered here rather
+  than there on purpose: the honest answer leans on the presenter seam, and
+  the seam was only just proved. Asking it earlier would have spent the
+  argument on credit.
+  Open with "mostly, no" and mean it. Conceding the premise immediately is
+  what buys the next three steps — a defensive answer here would sound like
+  a man who has not noticed what decade it is.
+  Step 1 is about BUILDING, not about desktops: specified, observable, and
+  already everywhere via XWayland. Those are reasons it was a good first
+  backend, which is a different claim from it being a good future.
+  Step 3 is the one they will remember, and it is worth being precise: this
+  is not "Wayland is worse". Wayland dropped network transparency
+  deliberately, and remote display is a layer on top rather than a hole in
+  it. Say "deliberately" out loud.
+  If somebody asks about waypipe or RDP afterwards — good, that is the
+  question you wanted, and the answer is yes, and they are re-encoding
+  because there is nothing in the protocol to forward.
+  90 seconds.
+---
+
+# Do we still need X11?
+
+Mostly, **no**.
+
+Wayland is where the Linux desktop went, and I am not going to stand here and
+pretend otherwise.
+
+^^^
+
+But as a *first* backend it was the right one — for reasons about **building**
+rather than about desktops:
+
+- **It is specified.** You can implement it from a document. That is the whole
+  of the boundary argument, and it made the first backend a reading exercise
+  rather than a reverse-engineering one
+- **It is observable.** You watched it decode itself, field by field. Try that
+  with a shared-memory buffer handle
+- **It already runs everywhere.** Every Wayland desktop ships XWayland, so an
+  X11 client is not a subset of Linux — it is all of Linux, today, unmodified.
+  And there are still sessions that come up on X by default
+
+^^^
+
+And after the last slide, the honest framing is that **X11 is a backend, not
+the architecture.**
+
+One presenter drives it. Cocoa was the second. Wayland is high in the plans
+and it is the third time rather than the first — which was the point of
+breaking the purity rule in the first place.
+
+^^^
+
+Though there is one thing X11 has that Wayland **deliberately** does not.
+
+Wayland is a local compositor protocol: buffers are shared memory and file
+descriptors, and remote display is a layer built on top — waypipe, RDP, a VNC
+server, all of them re-encoding because there is nothing in the protocol to
+forward.
+
+X11 has been able to put a window from one machine onto another machine's
+screen since 1987, because that is what it was built for.
+
+^^^
+
+> So: do we need X11? No.
+> Do we need *a* protocol — chosen deliberately, with the whole toolkit above
+> it unchanged? That was the entire argument.

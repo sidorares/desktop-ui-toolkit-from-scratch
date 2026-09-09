@@ -16,7 +16,19 @@
 // That is why this demo needs no calendar service configured on the laptop it
 // is presented from, and it is not a cheat: the shape below *is*
 // `useDesktopCalendarEvents().events`, down to the `byDay` grouping, which is
-// the package's own function.
+// the library's own function.
+//
+// That import moved. It was `@react-x11/components/desktop-calendar` until
+// components 0.4.0; react-x11 2.9.1 promoted the D-Bus half into **core** and
+// dropped the subpath, because reading the user's calendar is one of the
+// things an app does *outside* its own windows — like notifications, the tray
+// and the file dialog — and every one of those is a ladder in core with a
+// freedesktop rung and a macOS one. The macOS rung reaches EventKit through
+// `@windowkit/appkit`, which only core can see.
+//
+// Which is slide 26's loop, having happened to this file: drafted in an app,
+// found to be the thing every app would write itself, promoted. Nothing else
+// changed — the migration was these two import lines.
 //
 // The booking rules are the component's, not ours. `min` is today, the
 // sold-out days come back through `isDateBlocked`, and because `spanBlocked`
@@ -26,7 +38,7 @@
 import { useMemo, useState } from 'react';
 import type { ReactElement } from 'react';
 
-import { Button, Select } from 'react-x11';
+import { Button, Select, byDay } from 'react-x11';
 import {
   CALENDAR_WIDTH,
   Calendar,
@@ -37,8 +49,7 @@ import {
   today,
 } from '@react-x11/components/calendar';
 import type { CalendarDay, DateRange } from '@react-x11/components/calendar';
-import { byDay } from '@react-x11/components/desktop-calendar';
-import type { DesktopEvent } from '@react-x11/components/desktop-calendar';
+import type { DesktopEvent } from 'react-x11';
 
 import { Caption, fill } from './panel.js';
 

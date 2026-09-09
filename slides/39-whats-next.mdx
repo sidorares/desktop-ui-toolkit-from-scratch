@@ -1,0 +1,55 @@
+---
+title: What's next
+notes: |
+  The recruiting slide, and the list changed shape — MDX shipped in
+  components 0.6.0 (these slides ARE .mdx) and the workbench is out at 0.2.0
+  with 74 stories, so neither is "next" any more. Do not read the old list.
+  What is left is not a feature list. It is the work that only real use
+  produces, which is a more honest and more interesting thing to say.
+  Step 3 is the one to land. The inline-code bug is REAL and it has been on
+  screen all evening: `<Markdown>` draws the chip behind inline code by
+  reading the span each laid-out run came from, and react-x11's Cocoa text
+  engine reports run geometry only — so on macOS the chips are skipped. Point
+  at a piece of inline code on this very slide. It is cosmetic, it is
+  documented, and admitting it out loud is worth more than the slide costs.
+  If nobody has a question after this, that beat usually produces one.
+---
+
+# What's next for react-x11
+
+The list is not "features I have not built yet" any more. It is the work that
+only real use produces.
+
+^^^
+
+- **The Wayland backend**, as the last-but-three slide promised — and Windows
+  behind it, on the same node tree
+- **Finish the accessibility coverage** — AT-SPI is wired, the coverage is
+  not. This is the one I would most like help with
+- **Keep tweaking performance** — four budgets, and every new application
+  fails a different one
+
+^^^
+
+And the one that matters most: **real users.**
+
+The bug I actually need is one I did not predict. Everything on these slides
+is one person's taste, tested against one person's applications — and fifteen
+years of knowing exactly what I wanted is also fifteen years of my own blind
+spots.
+
+^^^
+
+So let me pay for that with a bug that has been on screen all evening.
+
+`<Markdown>` draws the rounded chip behind `inline code` by reading the span
+each laid-out run came from. react-x11's Cocoa text engine reports run
+geometry only — so on macOS the chips are skipped.
+
+**Every piece of inline code in this talk has been missing its background.**
+It is cosmetic, it is written down, and nobody in this room noticed until I
+said so.
+
+^^^
+
+All of it is on GitHub, and the good first issues are real ones.

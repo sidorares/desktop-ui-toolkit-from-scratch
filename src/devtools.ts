@@ -21,6 +21,7 @@ import {
   spawnDetached,
   isLive,
 } from './processes.js';
+import { runScript } from './runtime.js';
 import type { ProcessState } from './processes.js';
 
 /** Where the backend looks for the frontend — react-x11's own defaults. */
@@ -35,9 +36,10 @@ export const EXAMPLE = 'examples/devtools-demo.tsx';
 
 /** What the button does, in the form a presenter would type. On the slide,
  *  because the button is the convenience and these are the point. */
+const RUN = runScript(EXAMPLE);
 export const COMMANDS = [
   'npx react-devtools',
-  `REACT_X11_DEVTOOLS=1 npx tsx ${EXAMPLE}`,
+  `REACT_X11_DEVTOOLS=1 ${RUN.display}`,
 ] as const;
 
 export interface DevToolsState {
@@ -153,10 +155,10 @@ export async function start(): Promise<void> {
 
   store.set({ app: { status: 'starting', detail: `${EXAMPLE}, bridge on` } });
   app = spawnDetached({
-    // This same node, with tsx's loader: no bin lookup, and the runtime the
-    // deck is itself running on.
-    command: process.execPath,
-    args: ['--import', 'tsx', path.join(ROOT, EXAMPLE)],
+    // The deck's own runtime, with a loader only if it needs one — bun
+    // transpiles this file itself. See `runtime.ts`.
+    command: RUN.command,
+    args: RUN.args,
     cwd: ROOT,
     env: { REACT_X11_DEVTOOLS: '1' },
     onStderr: (note) => run === generation && store.set({ note }),

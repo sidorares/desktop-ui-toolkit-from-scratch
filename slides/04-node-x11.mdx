@@ -1,14 +1,19 @@
 ---
 title: node-x11, 2011
 notes: |
-  Personal history beat. Keep it short and warm — the payoff comes on the
-  timeline slide near the end, so don't spend the punchline here.
+  Personal history beat. Keep it short and warm — the payoff is the timeline
+  near the end, so don't spend the punchline here.
   First commit: 7 June 2011.
+  The last step hands off to the protocol section. Do NOT ask "so what is a
+  toolkit?" here — that question gets asked and answered on the "easy 20%"
+  slide, and
+  asking it now leaves it hanging through seven slides.
 ---
 
 # node-x11 — June 2011
 
-A pure-JavaScript X11 protocol client. No bindings, no `node-gyp`, no Xlib.
+A pure-JavaScript X11 protocol client. No bindings, no `node-gyp`, no Xlib —
+just the protocol, encoded and decoded in JS.
 
 ^^^
 
@@ -22,5 +27,13 @@ display.client.MapWindow(wid);
 
 ^^^
 
-That was fifteen years ago. It stayed a *protocol library* — you could
-open a window, but you had to draw everything yourself.
+That was fifteen years ago. And for fifteen years it stayed exactly that: a
+*protocol library*. You could open a window. You could fill a rectangle. And
+then you were on your own.
+
+^^^
+
+Because **opening a window is not a toolkit.**
+
+Before we work out what is — it is worth ten minutes on what that library
+actually talks to. Three ideas, and then we watch them on the wire.

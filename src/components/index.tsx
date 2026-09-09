@@ -11,7 +11,9 @@
 // re-parses every slide and defeats `<Markdown>`'s per-block cache.
 export { Booking } from './booking.js';
 export { Charts } from './charts.js';
+export { ChartsDemo } from './chartsdemo.js';
 export { DataViz } from './dataviz.js';
+export { Ecosystem } from './ecosystem.js';
 export { DevTools } from './devtools.js';
 export { Documents } from './documents.js';
 export { HotReload } from './hotreload.js';
@@ -28,6 +30,8 @@ export { Wire } from './wire.js';
 
 export type { BookingProps } from './booking.js';
 export type { ChartsProps } from './charts.js';
+export type { ChartsDemoProps } from './chartsdemo.js';
+export type { EcosystemProps } from './ecosystem.js';
 export type { DataVizProps } from './dataviz.js';
 export type { DevToolsProps } from './devtools.js';
 export type { DocumentsProps } from './documents.js';

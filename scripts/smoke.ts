@@ -34,3 +34,20 @@ for (const [i, s] of slides.entries()) {
 }
 console.log(`\n${slides.length} slides, ${steps} steps`);
 console.log(`components available: ${[...KNOWN].sort().join(', ')}`);
+
+// **A `<Placeholder>` is a promise to finish something, and the deadline is a
+// talk.** It renders a labelled box the size the demo will be, which is the
+// right thing while a slide is being written and the wrong thing on a
+// projector — and the failure mode is that nobody notices, because a
+// placeholder looks deliberate. So finishing the demos stops being something
+// to remember the night before and becomes a check that fails.
+const placeholders = slides
+  .filter((s) => /^<Placeholder/m.test(s.source))
+  .map((s) => s.id);
+
+if (placeholders.length) {
+  console.error(
+    `\n!! ${placeholders.length} slide(s) still name <Placeholder>: ${placeholders.join(', ')}`,
+  );
+  process.exit(1);
+}

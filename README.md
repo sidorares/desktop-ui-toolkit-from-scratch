@@ -4,15 +4,36 @@ A talk for MelbJS about [react-x11](https://github.com/sidorares/react-x11) —
 presented in an app built with react-x11.
 
 The deck is an X11 client. The slides are markdown; the demos are live
-components; the terminal on slide 2 is a real shell, slide 14 is the
-component library demonstrating itself, and slide 15 reads the calendar the
+components; the terminal on slide 2 is a real shell, slide 19 is the
+component library demonstrating itself, and slide 20 reads the calendar the
 desktop already has.
 
 ## Running it
 
 ```bash
 npm install
-npm start
+npm start        # node, through tsx
+npm run start:bun
+```
+
+**Either runtime works, and the launcher slides adapt to which one you used.**
+That is not cosmetic: the buttons on the wire, DevTools, Fast Refresh and
+charts slides spawn child processes, and they used to spawn
+`process.execPath` — which under `bun src/main.tsx` is *bun*, so every one of
+them ran `bun --import tsx …` and died on a Node loader bun does not want.
+`src/runtime.ts` resolves it per example now: bun runs TS and JSX with no
+loader at all, Node gets `--import tsx` only for files that need it, and the
+command printed on the slide is derived from the same call so it cannot drift
+from the one that ran.
+
+**Fast Refresh is the exception and needs Node.**
+`react-x11/refresh/register` uses Node's `module.registerHooks`, which bun
+does not implement, so that one launcher asks for `node` by name even when the
+deck itself is bun. On a machine with no `node` on `PATH` it fails in the
+panel like any other launcher.
+
+```bash
+npm run check:launchers   # what each one resolves to, and whether it starts
 ```
 
 On macOS this runs on react-x11's native Cocoa backend, which is the one to
@@ -35,6 +56,10 @@ npm run x11
 | `f` | toggle fullscreen (asks the window manager) |
 | `Esc` | hand the keyboard back to the deck, else leave fullscreen |
 | `r` | re-read `slides/` from disk (saves reload on their own) |
+| point at the progress line | the slide under the pointer |
+| click the progress line | go to that slide |
+| `p` | start the **pacemaker**, then pause / resume it |
+| `P` | reset the pacemaker to zero |
 | `⌘+` `⌘-` | **bigger** / **smaller** — `Ctrl` too, for a Linux desktop |
 | `⌘0` | back to 100% |
 
@@ -62,6 +87,56 @@ terminal would otherwise land *inside* the demo, and the arrow keys would
 stop being the deck's. Activating the window clears the focus instead, and
 the click that activated it is spent doing so. The way into a demo is a
 click made while the deck already has the keyboard.
+
+## Jumping about
+
+The progress line is a control. **Point at it** and a label above the pointer
+names the slide under it — number and title — and **click** to go there. The
+hit area is deliberately much taller than the two-pixel line it draws: a
+two-pixel target is a dare, not a control.
+
+A click seeks exactly where the label said, and lands on that slide's *first*
+step, the way every other navigation does.
+
+```bash
+npm run check:scrub
+```
+
+Drives real pointer events through the renderer's own hit testing, because
+none of that is a thing a screenshot can confirm. Two notes for anyone
+extending it: `queryByText` is a **substring** match unless you pass
+`exact` — `'1 / 40'` matches inside `'21 / 40'`, which silently turns every
+position assertion into a false pass — and injected pointer events arrive
+some unknown number of round trips later, so the probes wait for what they
+are about to assert rather than calling `settle()` a fixed number of times.
+
+## Pacing
+
+`p` starts a second progress line under the first one, and it fills once over
+**forty minutes**. Press it again to pause — for a question, or an
+interruption — and again to resume; `P` puts it back to zero for the next
+rehearsal.
+
+**The point is the gap between the two lines, not either line on its own.**
+The top one is where the slides have got to; the bottom one is where the clock
+has. If the bottom line is ahead of the top one, you are behind. That is a
+question a digital clock in the corner cannot answer without arithmetic
+performed on stage.
+
+The colour says it again for the back of the room, where two-pixel lines are
+hard to compare: muted while the two are within two minutes of each other,
+amber once the clock is meaningfully ahead, red once the slot is gone. The
+number beside it is time **remaining**, because "eleven minutes" is a decision
+and "twenty-nine minutes elapsed" is a subtraction.
+
+Nothing is drawn until it is armed, so a talk given without it looks exactly
+as it did before — and the two pixels are reserved either way, so pressing `p`
+mid-sentence does not reflow the slide above it.
+
+The clock is derived from a wall-clock start rather than counted in ticks, so
+a dropped timer or a machine that slept does not show up as drift.
+`npm run check:pace` asserts that, along with pause banking time instead of
+losing it and the colour thresholds firing where they should.
 
 ## Size
 
@@ -97,7 +172,7 @@ has to name a number.
 
 ## On the Dock
 
-The deck badges its own icon with where the talk has got to — `11 / 26`, the
+The deck badges its own icon with where the talk has got to — `11 / 37`, the
 same string the footer carries — through react-x11's `useBadge`. So the
 position is readable from the Dock with something else in front of the deck,
 which is the case a presenter is actually in: notes on one screen, the deck
@@ -181,7 +256,8 @@ shell one-liner keep its quotes and its pipe.
 | `<Wire>` | a node-x11 example, and a button that runs it through x11vis |
 | `<DevTools>` | starts React DevTools, then an app with the bridge on |
 | `<HotReload>` | starts an app under the refresh loader, and edits its source |
-| `<Placeholder>` | a box the size a demo will be, for one that isn't built |
+| `<ChartsDemo>` | a button that opens the charts example in its own window |
+| `<Placeholder>` | a box the size a demo will be, for one that isn't built — **no slide may ship naming it**, see [Smoke](#smoke) |
 | `<Widgets>` | core's controls, a variable font's axes and an `<svg>`, on one wire |
 | `<Documents>` | markdown, maths and HTML behind one strip of `<Tabs>` |
 | `<DataViz>` | `panel=` a series, a sequence, or the architecture graph |
@@ -189,8 +265,8 @@ shell one-liner keep its quotes and its pipe.
 | `<SourceCode>` | a file off disk, highlighted — the demo's own, usually |
 | `<Booking>` | a flight booking that reads the desktop's calendar |
 
-`<DataViz>` and `<Scenes>` are five of slide 14's seven steps, one `panel`
-each; `<Booking>` is slide 15. Between them the showcase is every component
+`<DataViz>` and `<Scenes>` are five of slide 19's seven steps, one `panel`
+each; `<Booking>` is slide 20. Between them the showcase is every component
 this talk claims: `<box>`, `<text>`, `<textinput>` and core's widgets;
 variable-font axes read off the font file; `<svg>`; `<Markdown>`, `<Formula>`
 and `<Html>`; `<Tabs>`; charts, the timeline, the flow pane with three nodes
@@ -240,7 +316,7 @@ And because `<Prose>` is remounted on every keypress, the processes are held
 in a module-scope store rather than in component state — stepping away from a
 slide and back finds the demo still running.
 
-**React DevTools** (17) — `npm run devtools`, then `npm run example:devtools`. The
+**React DevTools** (22) — `npm run devtools`, then `npm run example:devtools`. The
 button does both, in that order, because the backend connects to a socket
 that has to already be listening. The deck cannot inspect *itself*:
 `REACT_X11_DEVTOOLS` is read before React's first commit, so what opens is a
@@ -250,7 +326,7 @@ devDependencies, so `npm install` has them; the first drags in Electron, which
 is most of the install. A DevTools already listening on 8097 is used as it
 stands rather than replaced.
 
-**Hot reload** (18) — `npm run example:hot`. The second button rewrites two marked
+**Hot reload** (23) — `npm run example:hot`. The second button rewrites two marked
 lines in [`examples/hot-demo-app.jsx`](examples/hot-demo-app.jsx), which is a
 save like any other: the loader's watcher applies it, and the count and the
 half-typed text on screen do not move. The variants cycle and the third press
@@ -344,3 +420,40 @@ Present on Cocoa.
 Anything here that turns out to be generally useful belongs in
 [`@react-x11/components`](https://github.com/sidorares/react-x11-components)
 instead — which is the loop the talk itself is about.
+
+## Smoke
+
+```bash
+npm run smoke
+```
+
+Parses every slide and prints one line each — step count, layout, whether it
+has notes, and which components it names, flagging any name that is not a key
+in the map. Then it **exits non-zero if any slide still names
+`<Placeholder>`**.
+
+That last check is the point. A placeholder draws a labelled box the size the
+demo will be, which is right while a slide is being written and wrong on a
+projector — and the failure mode is that nobody notices, because a
+placeholder looks deliberate. Finishing the demos should not be something to
+remember the night before.
+
+## The charts example
+
+```bash
+npm run example:charts
+```
+
+`@react-x11/components`' own `examples/charts.tsx`, copied in with its import
+repointed at the published package, and the button on slide 31 starts it.
+
+It is a **separate process with its own window** on purpose. The panel on that
+slide draws this deck's commit history — a few dozen points, the right size
+for a slide and the wrong size for the claim. "Cost follows pixels, not
+points" needs a million points, its own frame clock, and a HUD reporting what
+the last painted frame actually cost: mode, span, command count, estimated
+wire bytes. Zoom in and out of the million and the byte count does not move.
+
+A chart sharing this deck's connection would be reporting this deck's frames,
+and a demo that can wedge itself on a million points should not be able to
+take the talk down with it.

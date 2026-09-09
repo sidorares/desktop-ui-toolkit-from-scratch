@@ -1,0 +1,56 @@
+---
+title: Atoms, properties, selections
+notes: |
+  Speed-run all three. The payoff is the last line, so get there.
+  Atom = intern a string, get an integer. Property = a typed blob on a
+  window, keyed by atom. Selection = an atom one client owns, and the
+  clipboard is a negotiation with that owner rather than a buffer.
+  The point: X11 ships almost no policy. These three are the extension
+  mechanism, and every desktop convention — EWMH, drag and drop, the
+  clipboard, the taskbar — is built out of them. Sets up "a toolkit is what
+  makes an app belong".
+---
+
+# Three primitives, and no policy at all
+
+**Atoms** — hand the server a string, get an integer back. Server-side
+constants, interned once and shared by every client on the display.
+
+```
+InternAtom("_NET_WM_STATE")  →  353
+```
+
+Because sending `353` on every request is four bytes, and sending
+`"_NET_WM_STATE"` is not.
+
+^^^
+
+**Properties** — a named, typed blob attached to a window, keyed by an atom.
+`ChangeProperty(window, WM_NAME, STRING, "Hello")`.
+
+A window is therefore also a **key-value store**: its title, its icon, its
+class, its size hints, and whatever else anyone has agreed to look for.
+
+^^^
+
+**Selections** — an atom exactly one client *owns* at a time. The clipboard
+is a selection: to paste, you ask the owner to convert its value to a type
+you want, and it answers.
+
+So the clipboard is not a buffer somewhere. It is a **negotiation with
+whichever application you copied from** — which is why copying and then
+quitting that application loses it.
+
+^^^
+
+And now the point. X11 ships almost **no policy**. It has no concept of a
+taskbar, a maximised window, a drag, a tray or a menu.
+
+^^^
+
+Every one of those is a *convention* — an agreed atom, holding an agreed
+property, in an agreed format — that the desktop and the application both
+promise to honour.
+
+> Which is exactly why "belonging to a desktop" is not a feature you
+> implement. It is a set of agreements you keep.

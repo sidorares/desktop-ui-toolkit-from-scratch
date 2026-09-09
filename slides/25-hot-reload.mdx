@@ -1,6 +1,10 @@
 ---
 title: Save the file, keep the state
 notes: |
+  This is the only launcher that needs Node: `react-x11/refresh/register`
+  uses `module.registerHooks`, which bun does not implement, so it spawns
+  `node` by name even when the deck is running under bun. Worth knowing if it
+  is the one demo that fails on a strange machine.
   DEMO — 2 min, and the one to rehearse. Start it, click "count me" a few
   times, type something into the field, THEN press the edit button.
   The headline and its colour change; the count and the half-typed text do

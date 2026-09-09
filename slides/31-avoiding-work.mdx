@@ -1,0 +1,32 @@
+---
+title: The fastest work is the work you skip
+notes: |
+  The practical half — the advice that transfers to their day jobs even if
+  they never write an X11 client. There was not one clever algorithm in any
+  of it; every optimisation was a refusal.
+  Four refusals, one per budget, which is what makes them a set rather than
+  a list of tips. The next slide runs two of them; the other two were on the
+  showcase slide, so point back at it rather than repeating them.
+  The 3× line is the whole slide if you only land one thing.
+---
+
+# Every real optimisation was "don't"
+
+Not one clever algorithm in any of it. Every single one was a **refusal** —
+and there is one per budget, which is what makes them a set:
+
+^^^
+
+- **Don't draw detail nobody can see** — decimate a 3,000-point series to the
+  pixels it actually covers *(local CPU)*
+- **Don't draw too often** — frame gates, and pacing that adapts to how long
+  the last frame took *(the raster gate)*
+- **Don't redraw what did not move** — clip to the viewport, track damage
+  *(server CPU)*
+- **Don't send it twice** — glyph sets, and geometry in a server-side display
+  list *(network)*
+
+^^^
+
+The terminal got **3× faster on macOS by drawing less often.** Not by drawing
+faster — I did not change a single drawing call.

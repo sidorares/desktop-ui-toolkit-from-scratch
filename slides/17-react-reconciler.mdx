@@ -1,0 +1,54 @@
+---
+title: From protocol to React
+notes: |
+  This slide answers the question the previous one ends on — "what does owning
+  everything above a socket leave you to write?" — and the answer has two
+  halves of wildly different sizes. Say that up front, so the good news does
+  not read as the whole answer.
+  Keep the reconciler half SHORT — this is a JS meetup, they know React has
+  renderers. Land the "it is a protocol too" line, because it is the third
+  row of the table from the cold open and the room should start noticing the
+  pattern here.
+  The interesting half is the last step: with no DOM underneath, everything
+  the DOM was quietly doing becomes yours. Read that list slowly. It is the
+  honest scope of "from scratch".
+---
+
+# React needs a host, not a DOM
+
+Two answers, and they are wildly different sizes. Here is the small one.
+
+`react-reconciler` — the package React DOM and React Native are both built on
+— asks for a host config. How to make a thing, put it in another thing, and
+update it:
+
+```js
+createInstance(type, props)      // a retained node — <box>, <text>, …
+appendChild(parent, child)       // tree structure
+commitUpdate(node, old, next)    // diffed props land here
+```
+
+Answer those three and React will drive you. **The reconciler is a protocol
+too.**
+
+^^^
+
+That part is a weekend.
+
+^^^
+
+And here is the large one. Because the DOM was never just a tree of nodes —
+it was doing all of this for you, and never mentioned it:
+
+- **Layout** — no box model, no flow, no line boxes. Yoga, one node per
+  element, run client-side
+- **Text** — shaping, bidi, ligatures, font fallback, line breaking
+- **Painting** — damage tracking, double buffering, clipping, z-order
+- **Events** — hit testing front-to-back, capture and bubble, enter/leave —
+  which is not the same as move
+- **Focus** — traversal order, focus scopes, what a modal takes and returns
+
+^^^
+
+**That** is "from scratch". The reconciler is the easy end of it — the
+browser has been doing that list for you your entire career.

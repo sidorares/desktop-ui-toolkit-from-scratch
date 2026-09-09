@@ -26,6 +26,7 @@ import {
   spawnDetached,
 } from './processes.js';
 import type { ProcessState } from './processes.js';
+import { runScript } from './runtime.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
@@ -159,9 +160,11 @@ export async function run(example: string): Promise<void> {
       return;
     }
     store.set({ vis: { status: 'starting', detail: 'x11vis, and its window…' } });
+    // The visualizer's own launcher, run with whatever is running this deck.
+    const visRun = runScript(launcher, ['--port', String(PORT)]);
     vis = spawnDetached({
-      command: process.execPath,
-      args: [launcher, '--port', String(PORT)],
+      command: visRun.command,
+      args: visRun.args,
       cwd: path.dirname(path.dirname(launcher)),
       onStderr: (note) => attempt === generation && store.set({ note }),
       onError: (detail) => {
@@ -187,9 +190,10 @@ export async function run(example: string): Promise<void> {
   // One client at a time: the last example's window is not the one being
   // talked about, and its traffic is in the way of the traffic that is.
   killGroup(client);
+  const clientRun = runScript(examplePath(example));
   client = spawnDetached({
-    command: process.execPath,
-    args: [path.join(ROOT, examplePath(example))],
+    command: clientRun.command,
+    args: clientRun.args,
     cwd: ROOT,
     env: { DISPLAY },
     onStderr: (note) => attempt === generation && store.set({ note }),
