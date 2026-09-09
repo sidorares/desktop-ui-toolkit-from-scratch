@@ -1,636 +1,863 @@
 # Narration
 
-The talk as spoken, before it is slides. Read top to bottom; if the story
-does not hold here it will not hold on stage.
+The talk as spoken, start to finish. Read it top to bottom; if the story does
+not hold here it will not hold on stage.
 
-Stage directions in `[brackets]`. `[step]` is a `^^^` reveal.
-**A 40-minute slot.**
+**38 slides, 132 steps, a 40-minute slot.** One heading per slide, in order,
+so this file and `slides/` can be read side by side.
 
-> **This is the script, not the manifest.** The deck is now 38 slides — see
-> [slides-structure.md](slides-structure.md) for the as-built order and slide
-> numbers. This file still reads in the four acts it was drafted in, and a few
-> beats below landed on different slides than the headings imply; the wording
-> is what matters here, not the numbering. The three X11 protocol slides
-> (04–06) and the ecosystem graph (23) were added after this draft and are
-> described in the structure doc.
+Stage directions in *[brackets]*. `[step]` is a `^^^` reveal. **Demo slides get
+their spoken paragraphs written out**, because on eleven of these slides the
+words are the whole content — the slide is a running program and the prose is
+what you say over it.
 
 ---
 
 ## The thesis
 
 > **A desktop UI toolkit is a protocol client.**
-> Every hard part of this project turned out to be two parties agreeing on a
-> message format. The drawing was the easy bit.
+> Every hard part of this turned out to be two parties agreeing on a message
+> format. The drawing was the easy bit.
 
-That sentence is the spine, and it is what the current draft is missing. It is
-not a framing device bolted on top — it is *literally true at every layer*, and
-saying it out loud early is what turns twenty-seven slides into one argument:
+Said once in the cold open, and back at you on the last slide. It is not a
+framing device — it is true at six separate layers, and it is what makes
+thirty-eight slides one argument instead of a tour:
 
 | layer | the two parties | the format |
 | --- | --- | --- |
 | the wire | client ↔ X server | the X11 protocol |
-| belonging | app ↔ desktop | XDND, dbusmenu, AT-SPI, XDG portals |
+| belonging | app ↔ desktop | XDND, dbusmenu, AT-SPI, portals |
 | React | React ↔ host | the reconciler's host config |
-| tooling | DevTools frontend ↔ backend | the DevTools message channel |
+| tooling | DevTools ↔ backend | a socket, on `:8097` |
 | portability | toolkit ↔ platform | the presenter interface |
+| **the alternatives** | renderer ↔ main process | **a protocol you invented yourself** |
 
-Every act pays off the same idea. The macOS backend exists because of the last
-row. Issue #4 exists because of the third. The whole performance section
-exists because of the first.
+That last row is the one that earns the talk. An Electron app is also a
+protocol client; it is just a protocol nobody else implements.
 
-## The rule for demo slides
+## Two rules for delivery
 
-**Say it, then show it. Never both at once.**
+**Say it, then show it. Never both at once.** The slide before a demo ends on
+the claim; the demo slide's title *is* that claim; while it runs you say
+almost nothing. Eleven demo moments, one rhythm.
 
-A demo slide that is also making its own argument asks the room to read and
-watch simultaneously, and they will do neither. So: the slide *before* a demo
-ends on the claim, the demo slide's **title is that claim restated as fact**,
-and while the demo is on screen you say almost nothing. Five demo moments in
-the talk, one rhythm for all of them.
+**A demo that is running is doing the talking.** Press the button, then stop
+narrating the UI. Point at one thing. Wait.
 
 ---
 
-## Cold open — 2:30
+# Cold open — 2:30
+
+## 01 · Making a Desktop UI Toolkit From Scratch
 
 *[App already up. Say nothing for a beat. Let them look at it.]*
 
-Everything you are about to see for the next forty minutes is one Node
-process.
+## 02 · You are looking at the demo
 
-This is not a slide deck. It is an application. There is a window, a flex
-layout, shaped text and a markdown renderer, and all of it is drawn by the
-toolkit this talk is about.
+Everything you see for the next forty minutes is one Node process.
 
-*[step]* Including a real shell. *[click it, type something, `Esc`]*
+This is not a slide deck. It is an application — a window, a flex layout,
+shaped text and a markdown renderer — and all of it is drawn by the toolkit
+this talk is about.
+
+*[step]* Including a real shell.
+
+*[Click the terminal. Type something — `ls`, or `ps aux | grep node` if you
+want the point made twice. Then `Esc` to hand the keyboard back, and SAY that
+you did, because the room needs to know the deck did not break.]*
 
 *[step]* No browser. No Electron. No compiled UI module. One `node` process,
 talking to a display server over a socket.
 
-I'm Andrey. I want to spend the next forty minutes on one idea, and the idea
-is this: **a desktop UI toolkit is a protocol client.** Every hard part of this
-turned out to be two parties agreeing on a message format. The drawing was the
-easy bit.
+*[step]* I'm Andrey. One idea, for the next forty minutes: **a desktop UI
+toolkit is a protocol client.** Every hard part of this turned out to be two
+parties agreeing on a message format. The drawing was the easy bit.
 
 ---
 
-# Act I — the wire, and belonging (8:30)
+# The wire — 9:00
 
-## X11 is a protocol, not a library
+*Nine slides before the room is told why any of this matters. That is a real
+risk and the mitigation is pace: 05, 06 and 07 are a speed-run, and 09–11 are
+demos that carry themselves. If you are behind, 07 is the one to lose.*
 
-Start with the thing that makes any of this possible.
+## 03 · X11 is a protocol, not a library
 
-X11 is not a library you link against. It is a protocol — a byte stream over a
-socket. Your program is the client. Something else, the X server, owns the
-screen, owns the pixels, owns the memory the window lives in. You send it
-requests: `CreateWindow`, `MapWindow`, `PolyFillRectangle`,
-`RenderCompositeGlyphs`. It sends back events and replies.
+X11 is not something you link against. It is a byte stream over a socket. Your
+program is the client; something else owns the screen, the pixels, and the
+memory the window lives in. You send requests — `CreateWindow`, `MapWindow`,
+`PolyFillRectangle`. It sends back events and replies.
 
 Two consequences, and they are the whole talk.
 
-*[step]* **First: the wire carries drawing, not pixels.** You do not hand the
-server a framebuffer, you hand it a description — a rectangle here, this
-colour; this glyph, at this position. Which means anything that can write bytes
-to a socket can be a GUI toolkit. That includes Node, with no bindings at all.
+*[step]* **The wire carries drawing, not pixels.** You do not hand the server
+a framebuffer, you hand it a description: a rectangle here, this colour; this
+glyph, at this position. Which means anything that can write bytes to a socket
+can be a GUI toolkit. That includes Node, with no bindings at all.
 
-*[step]* **Second: there is a network in the middle.** Even when the server is
-on the same machine over a Unix socket, the *shape* of the thing is a network.
-Latency is a first-class design constraint and it always was — this was
-designed in 1987 to put a window from a mainframe onto a terminal across a
-campus. That decision is why the protocol is asynchronous, why a reply is
-something you learn to avoid asking for, and why a third of this talk is about
-round trips.
+*[step]* **And there is a network in the middle.** Even over a Unix socket on
+this machine, the shape of the thing is a network — because it was designed in
+1987 to put a window from a mainframe onto a terminal across a campus.
 
-## node-x11 — June 2011
+That decision is why the protocol is asynchronous, why a reply is something
+you learn to avoid asking for, and why a third of this talk is about round
+trips.
 
-I have known the first consequence for a while.
+## 04 · node-x11 — June 2011
+
+I have known the first of those for a while.
 
 In June 2011 I wrote a pure-JavaScript X11 client. No `node-gyp`, no Xlib, no
 bindings — just the protocol, encoded and decoded in JS.
 
-*[step, code]*
-
-That is fifteen years ago. And for fifteen years it stayed exactly that: a
-*protocol library*. You could open a window. You could fill a rectangle. And
-then you were on your own.
+*[step, the code]* That is fifteen years ago. And for fifteen years it stayed
+exactly that: a protocol library. You could open a window. You could fill a
+rectangle. And then you were on your own.
 
 *[step]* Because opening a window is not a toolkit.
 
-So what is?
+*[step]* Before we work out what is — ten minutes on what that library
+actually talks to. Three ideas, then we watch them on the wire.
 
-## Drawing rectangles is the easy 20%
+*[Do NOT ask "so what is a toolkit?" here. It gets asked and answered on the
+"easy 20%" slide, and asking it now leaves it hanging through seven slides.]*
 
-Here is the definition I have landed on, and it is the one that earns the title
-of this talk.
+## 05 · Every id is a promise you make yourself
 
-**A toolkit is what makes an application belong to the desktop it is running
-on.** And almost none of belonging is drawing.
+*[Speed-run, but this is the one that explains why the protocol feels fast.]*
 
-*[step]* Think about what you expect from a real desktop app and never think
-about:
+The connection handshake does not just say hello. The server hands back a
+**range of resource ids** — a base and a mask — and from then on the client
+mints its own.
 
-- It **integrates**. You drag a file from the file manager onto it. Its menu
-  appears in the desktop's own panel, not in its window. It opens the same file
-  dialog every other app opens.
-- It **looks native**. It follows the colour scheme. It goes dark when the
-  desktop goes dark. It honours reduced motion and increased contrast.
-- It is **accessible** — a screen reader can walk it, a magnifier can follow
-  the caret, someone can drive it without a mouse.
-- It is **localised** — the system's language, the system's date and number
-  formats.
-- It is **activatable** — `myapp://something` launches it, or focuses the copy
-  already running.
-- It is **distributable** — packaged, signed, updateable.
+*[step, the code]* `AllocID` is a local counter. It sends nothing.
 
-*[step]* Now the point. Every single one of those is a **protocol you have to
-speak**, not a feature you implement:
+*[step]* So `wid` is a **future**: a handle to a window that does not exist
+yet, and will not exist until the server gets round to reading the request
+three lines up. That is legal, and it is the whole trick — you can name a
+thing and use the name in the same breath, because both sides already agree
+who gets to invent names.
 
-| what the user sees | what you actually speak |
-| --- | --- |
-| drag and drop between apps | XDND — a handshake in properties and client messages |
-| the menu in the desktop's panel | `com.canonical.dbusmenu`, over D-Bus |
-| a screen reader reading your app | AT-SPI, over D-Bus |
-| the file dialog, the permission prompt | XDG desktop portals, over D-Bus |
-| going dark when the desktop does | a D-Bus settings read, X resources as fallback |
-| another app's icon in your tray | XEmbed, and `_NET_SYSTEM_TRAY_*` |
-| the screen not blanking mid-talk | a D-Bus idle inhibitor |
+*[step]* The alternative is the obvious design: *ask* the server to make a
+window and reply with its id. That costs a round trip **per object** — every
+window, pixmap, graphics context, font and glyph set.
 
-*[If anyone asks whether that list is aspirational: every row is a file.
-`dnd.js`, `dbusmenu.js` + `globalmenu.js`, `atspi.js` + `a11y.js`,
-`portal.js`, `appearance.js`, `trayhooks.js`, `idle.js` — plus `activate.js`,
-`clipboard.js`, `scale.js`, `compose.js`, `decorations.js`. And a parallel set
-under `cocoa/`.]*
+*[step]* A protocol built in 1987 for a network could not afford to ask
+permission for names. So it gave the names away at the door.
 
-Belonging to a desktop means being fluent in about a dozen conversations. None
-of them involve a pixel.
+## 06 · A window is a rectangle with three jobs
 
-*[step]* And the strongest version of that is not that your window looks
-right. It is that **the same JSX can leave your window entirely.**
+There are no widgets in X11. No buttons, no text fields, no menus.
 
-*[That is the claim. Do not demonstrate it here. Next slide.]*
+*[step]* One object, with three jobs: a **rectangle in a tree**, positioned
+relative to a parent that clips it — that is the entire layout model the
+server offers. A **paint surface** you may aim drawing requests at. And an
+**event source**, where a 32-bit mask says which events you want.
 
-## The same JSX, in somebody else's chrome  *(DEMO)*
+*[step]* That is the whole object. A button is a rectangle that accepts
+drawing, receives clicks, and has somebody's code deciding what it looks like
+in between.
 
-*[Say the first line, run it, then be quiet and let them look at the top of
-the screen rather than at the slide.]*
+*[step]* Which is why react-x11 makes **one** window and paints everything
+into it. A window per `<box>` would be thousands of pieces of server-side
+state, a round trip of setup each, and a hit test the server does instead of
+you — slower *and* less controllable.
 
-This is one line of JSX in this deck:
+*[This is the setup for the roadblock slide and for Cocoa. Do not skip it.]*
 
-`<MenuBar menus={…} />`
+*[step]* The server's job is the rectangle. Everything you think of as a user
+interface happens on this side of the socket.
 
-*[step]* And there it is — **in the macOS menu bar.** Not drawn by me. Not in
-my window. That menu is at the top of the screen, in the operating system's
-own chrome, and it got there because the same array that would draw a menu bar
-also serialises to the protocol the desktop is listening on.
+## 07 · Three primitives, and no policy at all
 
-On a Linux desktop with a panel, the same line goes out over
-`com.canonical.dbusmenu` instead. On a desktop with no global menu at all, it
-draws the bar itself.
+*[Fastest slide in the deck. Three things, then the point.]*
 
-*[step]* Same line, three outcomes, and the app does not branch — because
-**the array that draws the menu is the array that serialises.** That is not a
-compatibility shim. It is one data structure with three ports.
+**Atoms** — hand the server a string, get an integer back. Server-side
+constants, interned once, shared by every client on the display. Because
+sending `353` is four bytes and sending `"_NET_WM_STATE"` is not.
 
-*[step]* And the same trick runs in the other direction. On X11 this deck can
-be a **tray host** — other applications dock their status icons into my flex
-layout over XEmbed, which is my app being desktop infrastructure rather than
-consuming it — and mpv reparents into a flex child, laid out by yoga, resizing
-when the pane resizes.
+*[step]* **Properties** — a named, typed blob on a window, keyed by an atom.
+So a window is also a key-value store: its title, its icon, its class, its
+size hints, and whatever else anyone has agreed to look for.
 
-*[If presenting on Cocoa, that last beat is a sentence and a screenshot, not a
-live demo. See slides-structure.md.]*
+*[step]* **Selections** — an atom exactly one client *owns* at a time. The
+clipboard is a selection: to paste, you ask the owner to convert its value to
+a type you want, and it answers. So the clipboard is not a buffer somewhere,
+it is a negotiation with whichever app you copied from — which is why copying
+and then quitting that app loses it.
 
-## The browser is very good at the other half
+*[That last line usually gets a noise of recognition. Wait for it.]*
 
-So — the obvious question. Why not just use a browser? I want to be fair here,
-because the browser is a superb platform and pretending otherwise would be
-dishonest.
+*[step]* And now the point. X11 ships almost **no policy**. It has no concept
+of a taskbar, a maximised window, a drag, a tray or a menu.
 
-A web page gets a *lot* for free, and specifically it gets the easy 20% for
-free. Layout, text shaping, font fallback, a compositor, a rendering pipeline
-thousands of people have tuned for twenty years. If your app is a document, a
-browser is the correct answer and you should use one.
+*[step]* Every one of those is a *convention* — an agreed atom, holding an
+agreed property, in an agreed format — that the desktop and the application
+both promise to honour. Which is exactly why belonging to a desktop is not a
+feature you implement. It is a set of agreements you keep.
 
-*[step]* What it gives up is the other 80%. One sandbox, one tab. It does not
-get the user's window manager, the tray, the global menu, D-Bus, the
-filesystem, per-monitor scale — and it certainly does not get to put somebody
-else's video player inside a flex box.
+## 08 · You can watch every byte
 
-*[step]* Smaller proof, running right now: while this slide has been up, this
-deck has been holding a **sleep inhibitor**, so the screen cannot blank in the
-middle of my talk. That is one hook — `useKeepAwake()` — and underneath it is a
-D-Bus call to the desktop's idle service. There is no web API for that, and
-there should not be.
+*[DEMO. x11vis is a separate X11 app under XQuartz — start it BEFORE the talk
+and alt-tab. Do not launch it live.]*
 
-So it is not "the browser is bad". It is: **a different set of things is
-hard**. The browser makes drawing easy and belonging impossible. I wanted to
-find out what the other trade looks like.
+This is a man-in-the-middle proxy. It sits between a client and the server and
+decodes the protocol live: every request, reply, event and error, with the
+byte range for each decoded field. Click any resource id and it links back to
+the request that created it.
+
+*[Run the trivial client.]* Here is a program that opens a window and draws
+something. **Twenty-two messages. About five milliseconds.**
+
+*[step — flip the network preset to Slow 3G and re-run. SAY NOTHING while it
+runs. Let the room watch the list crawl.]*
+
+Same twenty-two messages. **Two point nine seconds.**
+
+Nothing about the program changed. Hold that number — the performance section
+is about that number.
+
+*[step]* And, fittingly: this tool's own UI is an X11 application built with
+react-x11. The visualizer is one of its own clients.
+
+*[2 min. Come back to the deck.]*
+
+## 09 · The smallest thing you can see
+
+*[DEMO, first of three. 90 seconds. Press Run and keep talking — x11vis opens
+its window, then the example runs against it.]*
+
+The smallest program that puts something on a screen. Four requests.
+
+*[step]* A handshake, then **four requests and not one reply.** `CreateWindow`
+and `MapWindow` are one-way — nothing here waits for the server.
+
+*[Point at the `AllocID` line and read it out loud.]* And that id in the first
+argument was invented by the client, out of the range the server handed over
+at connect time. Naming a window cost no round trip. That is the slide from
+five minutes ago, on the wire.
+
+*[If x11vis is not on the machine the panel says so. Talk through the code and
+move on — do not debug on stage.]*
+
+## 10 · One bit more, and it answers back
+
+*[DEMO, 60 seconds. Run it, then click the window a few times and let the room
+watch events appear.]*
+
+Same program, one field different.
+
+*[step]* `eventMask` is a 32-bit set inside the *same* `CreateWindow`. Asking
+for clicks cost four bytes and no extra request — nothing here registered a
+listener over the wire.
+
+And every click comes back as 32 bytes the client never asked for. Which is
+the half of the protocol that is not request/reply at all: the server talks
+first, and your program's job is to be listening.
+
+## 11 · Three shapes, and every byte accounted for
+
+*[DEMO, 90 seconds, and the one to linger on.]*
+
+Three shapes cover almost the whole protocol.
+
+*[Run it. Select `ChangeProperty` and click the `name` field — the bytes light
+up in the hex dump. Show the pad byte.]*
+
+A **value list**: a mask, then one 32-bit value per set bit, in mask order. A
+**string**: 8-bit units padded up to a multiple of four, with a length that
+counts the characters and not the padding.
+
+*[Now select `GetGeometry` and follow the link to its reply.]*
+
+*[step]* And the one request here that asks a question. Its reply carries a
+**sequence number**, which is how you know which question it answered — there
+is no ordering guarantee otherwise, because nothing waited.
+
+That is the whole request/reply story in one click. And every one of these is
+a round trip you would rather not make, which is the slide we come back to
+later.
 
 ---
 
-# Act II — React, without a DOM (11:00)
+# Why build one — 5:30
 
-## React needs a host, not a DOM
+## 12 · Drawing rectangles is the easy 20%
 
-I want to build the 80%, and I want to write applications in React, because
-that is the programming model I want.
+So: rectangles that take clicks, text drawn by id, and a key-value store on
+every window. That is everything the protocol gives you.
 
-The good news is that React does not require a DOM. It requires a *host*.
-`react-reconciler` — the package React DOM and React Native are both built on —
-asks you for a host config. Roughly: how do I make a thing, how do I put a
-thing inside another thing, how do I update a thing.
+Back to the question I left hanging. If a protocol library is not a toolkit,
+what is?
 
-*[code: createInstance / appendChild / commitUpdate]*
+*[step]* A toolkit is what makes an application **belong to the desktop it is
+running on**. And almost none of belonging is drawing.
 
-That is the interface. Answer those three and React will drive you. **The
-reconciler is a protocol too** — the third row of the table I opened with.
+*[step]* Everything you expect from a real desktop app and never think about
+is a protocol you have to speak, not a feature you implement.
 
-*[step]* That part is a weekend. Genuinely — a weekend gets you rectangles on
+*[Read three or four rows ACROSS. Left column is what a user would say they
+expect; right column is the actual work.]*
+
+Drag and drop is XDND — a handshake in properties and client messages. The
+menu in the panel is dbusmenu, over D-Bus. A screen reader is AT-SPI, also
+D-Bus. File dialogs and permission prompts are XDG portals. Even "what colour
+scheme is the desktop using" is a D-Bus settings read.
+
+*[If anyone doubts the list is real: every row is a file. dnd.js, dbusmenu.js,
+atspi.js, portal.js, appearance.js, trayhooks.js.]*
+
+*[step]* Belonging to a desktop means being fluent in about a dozen
+conversations. **None of them involve a pixel.**
+
+*[step]* And here is what that buys. `<MenuBar menus={…}/>` hands its menu to
+the panel over dbusmenu where one exists, and draws the bar itself where none
+does. Same line either way — because the array that draws the menu is the
+array that serialises. Not a compatibility shim: one data structure, two
+ports.
+
+## 13 · The question I have been putting off
+
+*[Open by admitting it. It gets a laugh and it shows you know.]*
+
+Why would anyone build this? People run JavaScript on the desktop every day.
+
+*[step]* And they do it in one of two ways. You either **wrap a browser** —
+Electron ships Chromium and Node together, Tauri borrows the OS webview with
+Rust behind it — or you **wrap a toolkit**: nodegui gives you Qt over
+bindings, node-gtk gives you GTK through GObject introspection, and
+nodegui-react and gtkx put React onto those widgets.
+
+*[step]* Both are good answers, and I want to be clear about that. Electron
+ships the editor most of this room writes code in. nodegui hands you real Qt
+widgets a Qt developer would recognise.
+
+*[Be generous here. Nobody should feel sold to.]*
+
+*[step]* But look at what they have in common. **Both are wrappers.** One
+wraps a rendering engine built for documents. The other wraps a toolkit built
+for C++.
+
+*[step]* In neither case is the toolkit itself made of the language you are
+writing. There is always a boundary — and the interesting question is what
+that boundary costs you, which is different for each. Two slides, one per
+column.
+
+## 14 · The browser is very good at the other half
+
+A web page gets **the easy 20% for free**, and it is a colossal 20%: layout,
+text shaping, bidi, font fallback, a compositor, an accessibility tree, i18n,
+and a rendering pipeline thousands of people have tuned for twenty years.
+
+If your application is a document, this is the right answer. Use it.
+
+*[step]* What it gives up is the other 80%, and it gives it up in a specific
+shape. **Nothing your UI draws can leave the page.** A menu cannot become the
+desktop's menu — it is a `<div>`. A popup cannot be a real window with its own
+hints; it is clipped to the viewport it was born in. A tray icon is not
+expressible at all.
+
+*[step]* **And anything that touches the desktop has to be serialised to
+another process.** Files, D-Bus, the tray, the global menu, keep-awake,
+per-monitor scale — none of it is reachable from the half of your app that
+draws. It lives in the main process, in a different language, behind a
+channel.
+
+*[step]* So the component that needs the desktop and the code that can reach
+it are on opposite sides of a serialisation boundary — and you maintain the
+message format between them, by hand, for every interaction.
+
+Which means an Electron app is **also** a protocol client. It is just a
+protocol you had to invent, and you are its only implementer.
+
+*[Land this hard. It is the thesis arriving from the other direction, and it
+is the moment the talk stops being a curiosity.]*
+
+*[step]* While this slide has been up, this deck has been holding a sleep
+inhibitor, so the screen cannot blank mid-talk. One hook — `useKeepAwake()` —
+called from the component that cares. No channel, no main process, no message.
+
+## 15 · The other column: real widgets, over a bridge
+
+*[Shorter slide, but do not skip it — without it the talk looks like it only
+considered Electron.]*
+
+nodegui hands you Qt. node-gtk hands you GTK. Both give you widgets a native
+developer would recognise — the platform's own look, its own accessibility,
+its own decades of work — and you implemented none of it. That is a real win,
+and it is the thing this project has to work hardest to earn.
+
+*[step]* The cost is a boundary in a different place. **Your tree is not the
+widget tree** — it is a script that drives one, and every prop crosses a
+language boundary to get there. You inherit their threading model, their event
+loop and their build story. And the layer you most want to change is the layer
+you cannot reach.
+
+*[step]* So both columns are a boundary. One puts it between your UI and the
+desktop; the other between your code and the widgets.
+
+*[step]* The question this talk is: **what if there were no boundary?** What
+if the layout, the text, the painting and the protocol were all just
+JavaScript you could open and read?
+
+And the answer is that it is a *lot* of work — work the browser and Qt had
+both already done for you, which is exactly why they are reasonable answers.
+The next slide is the bill.
+
+---
+
+# React, without a DOM — 6:00
+
+## 16 · React needs a host, not a DOM
+
+The good news is that React does not need a DOM. It needs a **host**.
+`react-reconciler` — the package React DOM and React Native are both built on
+— asks for a host config: how to make a thing, put it in another thing, and
+update it.
+
+Answer those three and React will drive you. **The reconciler is a protocol
+too** — the third row of the table from the cold open.
+
+*[step]* That part is a weekend. Genuinely — a weekend gets rectangles on
 screen that update when state changes.
 
-## Hello, desktop — the whole program
+*[step]* And here is the bill I promised. When you remove the DOM you do not
+just lose an API; you lose everything it was quietly doing for you and never
+mentioned.
 
-So let me show you the whole thing, end to end, because I have been talking
-about a toolkit for ten minutes and you have not yet seen a program.
+*[Read this list slowly. It is the honest scope of "from scratch".]*
 
-```jsx
-import { createRoot } from 'react-x11';
+**Layout** — no box model, no flow, no line boxes. **Text** — shaping, bidi,
+ligatures, font fallback, line breaking. **Painting** — damage tracking,
+double buffering, clipping, z-order. **Events** — hit testing front-to-back,
+capture and bubble, enter and leave, which is not the same as move. **Focus** —
+traversal order, focus scopes, what a modal takes and gives back.
 
-function App() {
-  return (
-    <window title="Hello" width={400} height={300}>
-      <text style={{ fontSize: 24, padding: 20 }}>Hello, desktop</text>
-    </window>
-  );
-}
+*[step]* **That** is "from scratch". The reconciler is the easy end of it —
+the browser has been doing that list for you your entire career.
 
-const root = await createRoot();
-root.render(<App />);
-```
+## 17 · Hello, desktop
 
-That is the file. `node app.jsx`, and there is a window on your screen.
+Ten minutes of me talking about a toolkit and you have not seen a program.
 
-*[step]* No HTML file. No bundler, no dev server, no `index.html` with a `div`
-in it that everything gets mounted into. `createRoot()` opens a connection —
-to `$DISPLAY`, or on this machine to the Cocoa presenter — and `render` puts a
-tree on the other end of it.
+*[The code.]* That is the file. `node app.jsx`, and there is a window on your
+screen. No bundler, no dev server, no `index.html` with a div in it to mount
+into.
 
-*[step]* And notice where the window is. **`<window>` is in the tree.** It is
-not ambient context you configure from outside the app; it is an element, with
-props, reconciled like everything else. Which has consequences that all fall
-out for free:
+*[step]* And those last two lines are the bottom of this deck's own
+`src/main.tsx`. Not a simplified example — what is running.
 
-- The title is a prop. Put state in it and the titlebar updates, because it
-  went through the same commit as the text did.
-- Two `<window>`s is a multi-window application. There is no separate window
-  API to learn.
-- A `<popup>` is a window with different hints for the window manager — so
-  menus, tooltips and dialogs are the same machinery, not a special case.
+*[step]* Notice where the window is. **`<window>` is in the tree**: an element,
+with props, reconciled like everything else. Three things fall out of that for
+free. The title is a prop, so put state in it and the titlebar updates. Two
+`<window>`s is a multi-window app, with no second API to learn. And a
+`<popup>` is a window with different window-manager hints — so menus, tooltips
+and dialogs are the same machinery, not a special case.
 
-*[step]* And a confession about that snippet: those last two lines are the
-bottom of this deck's own `src/main.tsx`. That is not a simplified example.
-That is what is running.
+*[Callback: that is the thing the browser slide said was impossible. A popup
+here is a real window, not a div clipped to a viewport.]*
 
-## What `createRoot()` did before your first render
+## 18 · One line had already done this
 
-Which brings me back to the list from Act I, because I owe you a payoff on it.
+`await createRoot()` is one line. Before your first component rendered, it
+connected to the display, loaded the layout engine, **and dialled the session
+bus to start three protocol clients**: `appearance`, for the desktop's
+light/dark, accent, contrast and reduced motion; `a11y`, the AT-SPI bridge
+that decides whether a screen reader can see this app at all; and
+`globalMenu`, which decides whether a `MenuBar` hands its menu to the panel or
+draws it.
 
-`await createRoot()` is one line. Before your first component renders, it has
-connected to the display, loaded the layout engine — and **dialled the session
-bus to start three protocol clients on your behalf**:
+*[step]* And here is how you know that list is engineering and not a brochure:
+**you can turn it off.** `{ desktop: false }` for none of it, or one at a
+time. For a kiosk. A daemon. A test that needs the same answer on every
+machine. An embedder that owns those integrations itself and does not want a
+second app fighting it for the bus.
 
-| | |
-| --- | --- |
-| `appearance` | the desktop's light/dark, accent, contrast and reduced motion |
-| `a11y` | the AT-SPI bridge — whether a screen reader can see this app at all |
-| `globalMenu` | whether a `MenuBar` hands its menu to the panel or draws it |
+*[step]* That is the dozen conversations from twenty minutes ago, arriving as
+the default arguments of a constructor.
 
-*[step]* And here is how you know that list is real engineering and not a
-marketing bullet: **you can turn it off.**
+## 19 · It reads like the web, because it should
 
-```js
-await createRoot({ desktop: false });                  // none of it
-await createRoot({ desktop: { appearance: false } });  // just that one
-```
+*[The code.]* The goal was one sentence: a web developer should be able to
+read this without translating. Not "looks a bit like CSS" — actually reads.
 
-Because there are applications that should not do this. A kiosk. A daemon. A
-test that needs the same answer on every machine. An embedder that owns those
-integrations itself and does not want a second app fighting it for the bus.
+*[step]* But there is no stylesheet here and no cascade — a style is an object
+on a node. So the architecture forced all of this.
 
-*[step]* And that is where the menu bar you watched jump into the top of the
-screen came from. I never asked for a D-Bus connection. `createRoot()` had
-already opened one, because `globalMenu` defaults to on — which is the whole
-difference between a toolkit and a drawing library, expressed as a default
-argument.
+**Pseudo-states live in the object**, because there is no selector to put them
+in — and `:drag-over` and `:dragging` come free. **Container queries, not
+media queries**: the interesting size in a desktop app is the pane, never the
+screen, so the container query is the primitive and the window query is the
+special case. That is the exact opposite of the web's history. **Tokens, not
+variables** — `$surface` resolves against the theme, which came from the
+desktop over the bus `createRoot` opened. And **transitions on any number or
+colour**, because animation belongs to the value.
 
-## The shape it settled into
+*[step]* What you give up is real: no cascade, no selectors, no stylesheet you
+can ship separately. What you get is that every style is a value in the tree —
+which is why the whole thing can be diffed, and why a theme change is just a
+re-render.
 
-Here is the architecture, because everything after this refers to it.
+---
 
-- **the protocol client** — encode and decode X11, plus the extensions:
-  XRender for text and compositing, XInput for devices, XKB for keyboards, GLX
-  for OpenGL.
-- **the presenter** — the interface between *what should be on screen* and
-  *what this platform does about it*. Remember this one.
-- **the renderer** — the host config, plus layout, text, paint, events, focus.
-- **the elements** — `<window>`, `<popup>`, `<box>`, `<text>`, `<textinput>`,
-  `<image>`, `<canvas>`, `<svg>`, `<glarea>`. The host primitives; what
-  `createInstance` actually makes.
-- **the widgets** — buttons, selects, sliders, menus, dialogs, tabs, trees,
-  split panes. Written in React, in terms of the elements.
-- **components** — charts, tables, terminals, maps, a markdown renderer. A
-  separate package. Everything on these slides comes from it.
+# What's in the box — 7:00
 
-*[step]* Everything above the presenter line is platform-independent. Hold that
-thought for about fifteen minutes.
+## 20 · The whole box
 
-*[step]* And the reason that stack is deeper than it looks: when you remove the
-DOM you do not just lose an API. You lose everything the DOM was quietly doing
-for you and never mentioned.
+*[THE SHOWCASE. 4 min, seven steps, `reveal: replace`. One sentence per step,
+then STOP TALKING and let them look. No panel names a height — every one
+grows into whatever the slide has left, so this reads the same fullscreen and
+at any zoom.]*
 
-- **Layout.** No box model, no flow, no line boxes. Yoga, one node per element,
-  computed in-process.
-- **Text.** Shaping a string into positioned glyphs. Bidi. Ligatures. Font
-  fallback when your font does not have the character. Line breaking.
-- **Painting.** What actually changed. What needs redrawing. Double buffering
-  so nobody watches it happen. Clipping. Z-order.
-- **Events.** Hit testing front-to-back through a tree. Capture and bubble.
-  Enter and leave, which is not the same thing as move.
-- **Focus.** What is focused. What tab order means. What a modal takes when it
-  opens and gives back when it closes.
+**Step 1 — all of this is core.** Everything on screen is react-x11 itself,
+no components package: a text input, a slider, a switch, checkboxes, a radio
+group, a select, buttons, an icon, a progress bar, a tooltip. *[Drag the
+weight slider.]* And those are the font file's own axes, read off the machine
+this is running on — a variable font, driven from a slider, with an `<svg>`
+moving with it. *[Type in the field, and let the specimen and the vector move
+together. CAREFUL: clicking the field takes the keyboard, so `space` types a
+space. `Esc` gives it back.]*
 
-**That** is "from scratch". The reconciler is the easy end of it. The browser
-has been doing that list for you your entire career.
+*[step]* **Step 2 — three documents behind one strip of tabs.** Markdown, a
+formula, and HTML. *[Land the HTML tab.]* That `<select>` is not a picture of
+a menu — it is the same menu as step one's. And there is no browser and no
+webview behind it: the markup was parsed, the CSS cascaded, the boxes laid out
+and the text painted in this process. *[Switch tabs and back, to show the
+panels stayed alive.]*
 
-## What happens when state changes
+*[step]* **Step 3 — a series.** The commit-history numbers, drawn as an area
+instead of bars. Nothing new is being claimed; the component is the point.
 
-So: what actually happens when a component calls `setState`?
+*[step]* **Step 4 — a sequence.** A timeline, and the one thing on this slide
+that registers no element at all: box, text, and one absolutely-positioned
+pixel down the gutter.
 
-*[walk it once, left to right, slowly]*
+*[step]* **Step 5 — and a graph you can operate.** *[The slide's best three
+minutes if you have them.]* This is react-x11's architecture, drawn by
+react-x11: five stages from `setState` to the wire, with the backend swapped
+in one place at the bottom. Now watch — *[flip the backend radio]* — a branch
+goes. *[Turn the paint cache off]* — the edge under it starts marching.
+*[Tick a desktop hook]* — the D-Bus wing appears.
 
-- **Reconcile** — React's render phase. Pure, and — remember this word —
-  *discardable*. React is allowed to do this work and throw it away.
-- **Commit** — host mutations. Now my code runs: create these, append those,
-  apply this prop diff.
-- **Layout** — yoga, over the dirty subtree. In my process.
-- **Paint** — walk what is damaged, produce drawing commands, for the changed
-  regions only.
-- **The wire** — batched requests out, through the presenter.
+Those are real widgets, inside a drawn graph. Which is the seam worth naming:
+a `<Flow>` node normally paints itself, because a graph of ten thousand cards
+cannot afford a React subtree each — but a node that wants a switch rather
+than a picture of one asks for `render` and gets an ordinary react-x11 tree.
+*[The wheel zooms; under 0.6 the form nodes stop mounting, which is the budget
+that makes drawing the default.]*
 
-*[step]* Two of those stages are the entire performance story, and both are
+And the wing along the bottom is this deck: `useBadge` reaches the Dock
+without touching yoga, paint or the X connection.
+
+*[step]* **Step 6 — a map that pans.** This is live over the network. *[If the
+wifi is out it says so and draws the style's background. Say that out loud and
+move on.]*
+
+*[step]* **Step 7 — and a scene that spins, beside its own source.** GL through
+`<glarea>`. *[Drive it from the bar: spin to 0 and back, wireframe on, swap
+the shape, open the colour field. Then hit the SOURCE tab.]* That is the file
+this demo is running from, read off disk — not a snippet pasted into a slide.
+*[Point at the props in it, and at the widgets that were moving them.]*
+
+*[If behind: cut to steps 1, 5 and 6. Those carry the claim; 2, 3 and 4 are
+what people ask about afterwards.]*
+
+## 21 · Booking a flight, on a desktop
+
+*[DEMO. Short, and the argument is on the panel to the right — read it rather
+than paraphrasing it.]*
+
+A date range, with the airline's sold-out days blocked. And because a range
+may not *contain* a blocked day, the preview stops at the first one — which is
+what an airline that marked a date full actually meant.
+
+*[Point at the panel.]* And those dots are the user's own calendar. The panel
+says where they came from: a hook, the session bus, the desktop's calendar
+service, and behind that Google, Microsoft, CalDAV, local. The desktop signed
+into those accounts once, on the user's behalf, for every application on the
+machine.
+
+This application asked for **nothing**. No OAuth screen, no credential, no
+token to store and none to leak.
+
+*[step]* A web page cannot ask this question at all. It can only ask a server
+to ask it, on your behalf, after you have logged in again — and then keep a
+token that is worth stealing.
+
+*[That is the strongest argument for desktop integration in the talk. Let it
+sit for a second.]*
+
+## 22 · Your tooling still works
+
+*[Section opener for the next two slides. Deliberately short — they do the
+showing.]*
+
+And the reason is the same one as everything else in this talk: **the tools
+speak protocols too.** React DevTools does not know about the DOM — it talks
+to a backend over a socket, which is how React Native does it. Fast Refresh
+needs a module boundary and a re-render, neither of which is a browser thing.
+And the JSX source location babel already puts on every element is just…
+there.
+
+So a renderer with no DOM does not *implement* any of that. It **qualifies**
+for it.
+
+*[step]* Which includes one thing that was not free, and is my favourite:
+alt-click any element on screen and your editor opens on the JSX line that
+drew it. A hit test, the source location, and spawning `$EDITOR`. About fifty
+lines.
+
+*[If the room is warm, do it live — editor already open on a second desktop.
+If it is flaky, describe it; the line lands either way.]*
+
+*[step]* DevTools and Fast Refresh are the next two slides, running.
+
+## 23 · The debugger that ships with React
+
+*[DEMO, 2–3 min. Press the button FIRST and keep talking — the UI takes a few
+seconds, then the app window appears with the bridge on.]*
+
+The component tree, the props and hook state behind each node, and a profiler
+for the commits. In a browser this is an extension talking to the page. Here
+it is the standalone app, and the backend talks to it over a socket — which is
+why a renderer with no DOM gets it for nothing.
+
+*[step — the launcher.]*
+
+*[step]* Two processes, because the flag is read before React's first commit:
+an app cannot be handed DevTools once it is running. **This deck cannot
+inspect itself.** What opens is a second app, and the tree in that window is
+its tree.
+
+*[step]* *[Now drive it, in this order.]* The tree. Edit `step` on the counter
+and watch it re-render. Edit the name in the greeting's hook state. Then take
+the **crosshair** and pick a swatch by clicking it **in the app's window** —
+not in DevTools. And finally turn on "highlight updates" and watch the ticker
+outline itself, once a second.
+
+*[If it does not come up, the panel says which half failed. Move on — the next
+slide is the one that gets the reaction.]*
+
+## 24 · Fast Refresh, on a window the desktop owns
+
+*[DEMO, 2 min, and the one to rehearse. Start it, click "count me" a few
+times, type something into the field, THEN press the edit button.]*
+
+`node --import react-x11/refresh/register` and nothing else. No accept
+handlers, no loader files to copy. Saving a file re-evaluates the modules that
+changed and re-renders the components that came from them, in place.
+
+*[step — start it. Click the counter a few times. Type into the field. Now
+press "Edit the file".]*
+
+*[step]* The headline changed and its colour changed. **The count did not, and
+neither did the half-typed text.** And say the pid out loud: same process,
+same window, same X11 connection.
+
+That works because the connection lives *outside* React's tree. There was
+nothing to tear down.
+
+*[Better version if the room can see your editor: open the file on a second
+screen and save it yourself. The button is the one-projector fallback. It
+cycles three variants and the third press restores the file.]*
+
+---
+
+# Under the hood — 4:30
+
+## 25 · The ecosystem
+
+*[Drag a node if the room is warm — it is a real graph, not a picture.]*
+
+This is what you would actually install. An arrow means "depends on".
+
+Down the spine: the workbench, the components package, react-x11, ntk,
+node-x11, and a socket. Out to the right, what react-x11 pulls in. And two
+dashed edges that are **not** dependencies — the visualizer sits *on* the wire
+when `DISPLAY` points at it, and react-devtools is joined by a websocket on
+port 8097 and nothing else.
+
+*[Worth saying, because it is not drawn: the visualizer's own UI is a
+react-x11 app. It is a client of the thing it is debugging.]*
+
+*[step]* Now watch what happens when I dim everything written in JavaScript.
+
+**Three nodes are not.** And the differences between those three are the whole
+point. `yoga-layout` is amber, not red: it is compiled, but it ships as
+base64-inlined WebAssembly, so there is no toolchain and no `node-gyp`.
+`node-x11-dri` is optional, and only if you want OpenGL. And one of them is a
+decision I will have to defend later.
+
+## 26 · What happens when state changes
+
+*[Walk it top to bottom, once, slowly.]*
+
+`setState`. **Reconcile** — React's render phase, pure and — remember this
+word — *discardable*. **Commit** — host mutations; now my code runs.
+**Layout** — yoga, over the dirty subtree. **Paint** — the damaged regions.
+**The wire** — batched requests out.
+
+*[step]* Two of those stages are the whole performance story, and both are
 about the socket.
 
-**Layout never leaves the process.** This is not a small thing. If you asked
-the server "how wide is this string" for every text node every frame, that is a
-round trip per measurement, and a round trip is the most expensive thing
-available to you. So font metrics come across once and get cached, and
-everything after that is arithmetic on this side of the wire.
+**Layout never leaves the process.** If you asked the server how wide a string
+is for every text node every frame, that is a round trip per measurement — and
+you saw on the visualizer what a round trip costs. So font metrics come across
+once and get cached, and everything after that is arithmetic on this side of
+the wire.
 
 **Paint sends the smallest rectangle that changed.** A cursor blink in a
 terminal is one cell, not one screen.
 
-## React's render phase is discardable
+## 27 · React's render phase is discardable
 
 Now my favourite bug, because it is a bug you can only have if your host is a
 protocol.
 
-React's render phase is discardable. React will happily call `createInstance`
-for work it later decides it does not need — a component that suspended, an
-interrupted update, a branch it threw away. For React DOM that is completely
-fine: you made a `<div>` in memory, you never appended it, the garbage
-collector eats it, nobody finds out.
+React will happily call `createInstance` for work it later throws away — a
+component that suspended, an interrupted update, a branch it discarded. For
+React DOM that is completely fine: you made a div in memory, never appended
+it, the garbage collector eats it, nobody finds out.
 
-*[step]* It is **not** fine for `CreateWindow`. By the time I am back from that
-call the server has already allocated it. There is a resource on the other side
-of the socket with an ID, and no garbage collector on this side is going to
-reach across and free it. Render-phase work leaked real state into another
+*[step]* It is **not** fine for `CreateWindow`. By the time I am back from
+that call the server has already allocated it. There is a resource on the
+other side of the socket with an id, and no garbage collector on this side is
+reaching across to free it. Render-phase work leaked real state into another
 process.
 
-*[step]* And there is a second problem that stacks with it. X11 names a
-window's **parent at creation time** — the parent is an argument to
-`CreateWindow`. But React builds children before parents. By the time I know
-who the parent is, I have already had to create the child.
+*[step]* And a second problem that stacks with it: X11 names a window's parent
+**at creation time** — it is an argument to `CreateWindow`. But React builds
+children before parents. By the time I know the parent, I have already had to
+create the child.
 
-*[step]* Two tempting fixes, both bad. Create it detached and `ReparentWindow`
-it later — an extra round trip and a visible flash. Or stage it as an
-override-redirect window and adopt it — worse, and the window manager will
-notice.
+*[step]* Two tempting fixes, both bad. Create it detached and reparent later —
+an extra round trip and a visible flash. Or stage it as an override-redirect
+window and adopt it — worse, and the window manager will notice.
 
 *[step]* The actual fix is a rule: **no X11 calls in the render phase, at
-all.** `createInstance` returns a plain object — the *description* of a window
-that does not exist yet. Windows are realized in the **commit** phase,
+all.** `createInstance` returns a plain object — the description of a window
+that does not exist yet. Windows get realized in the **commit** phase,
 top-down, so every `CreateWindow` names its real parent from the start.
 
 Which, written down, is just the reconciler's own contract: render is pure,
-commit is where effects go. I had to have this bug to learn that the rule was
-not advice.
-
-`react-x11#4`
-
-## It reads like the web, because it should
-
-Back to the surface for a moment. Styles.
-
-```jsx
-<box style={{
-  padding: 12,
-  backgroundColor: '$surface',
-  transition: 150,
-  ':hover': { backgroundColor: '$surfaceHover' },
-  '@container width >= 400': { flexDirection: 'column' },
-}}>
-```
-
-The design goal was one sentence: **a web developer should be able to read this
-without translating.** Not "looks a bit like CSS" — actually reads.
-
-*[step]* But that goal argues with the architecture, and the argument is the
-interesting part. There is no stylesheet here and there is no cascade — a style
-is an object on a node. So:
-
-- **Pseudo-states live in the object**, because there is no selector to put
-  them in. `:hover`, `:focus`, `:active`, `:disabled` — and because drag and
-  drop is first-class here, `:drag-over` and `:dragging` for free.
-- **Container queries, not media queries.** In a desktop app the interesting
-  size is almost never the screen, it is the pane. So the container query is
-  the primitive and the window query is the special case — the exact opposite
-  of the web's history.
-- **Tokens, not variables.** `$surface` resolves against the theme, the theme
-  comes from the desktop over that D-Bus connection `createRoot` opened, which
-  is how dark mode arrives without the app asking for it.
-- **Transitions on any number or colour**, because animation is a property of
-  the value, not a rule in a stylesheet somewhere else.
-
-What you give up is real: no cascade, no selectors, no stylesheet you can ship
-separately. What you get is that every style is a value in the tree — which is
-why the whole thing can be diffed, and why a theme change is just a re-render.
-
-*[step]* And to be concrete: this slide is being drawn by three of them.
-
-## React DevTools. On an X11 window.  *(DEMO)*
-
-Then the thing that made me believe this was usable rather than a clever hack.
-
-*[step — the demo. Show, do not narrate the list.]*
-
-Component tree, props, hook state — live. Edit a prop and the app re-renders.
-The crosshair picks an element by clicking it **in the window**.
-Highlight-updates outlines the rectangles that just re-rendered. The profiler
-records the mount.
-
-*[step]* And here is *why*, and it is the thesis again: **DevTools is a
-protocol too.** The frontend does not know about the DOM. It talks to a backend
-over a message channel — that is how React Native does it, over a socket. So
-the renderer injects the backend and speaks it. I did not build DevTools. I
-qualified for it.
-
-*[step]* **Fast Refresh** works for a related reason. Save a file and the
-edited components update in place — and the X11 connection, the window and
-component state all survive, because the connection lives *outside* React's
-tree. Half-typed text in an input is still there.
-
-*[step]* And one thing that was not free, but is my favourite: **alt-click any
-element on screen and your editor opens on the JSX line that drew it.** That is
-the source location babel already puts on every element, plus a hit test, plus
-spawning `$EDITOR`. About fifty lines.
-
-The point is not the feature list. The point is that almost none of it is
-bespoke. It is React's own tooling, talking to a renderer that happens to draw
-on a display server.
+commit is where effects go. I had to have this bug to learn the rule was not
+advice.
 
 ---
 
-# Act III — latency is the design (9:00)
+# Make it fast — 6:00
 
-## How many times you talk is the whole story  *(DEMO)*
+## 28 · Four budgets, and they fight
 
-Right. Let us make it fast. But first: how do you even debug this?
+Performance here is not one number, it is four, and they trade against each
+other — which is unusual, and is what makes it interesting.
 
-*[demo — alt-tab to x11vis, already running]*
-
-A man-in-the-middle proxy. It sits between a client and the server and decodes
-the protocol live. Every request, reply, event and error, with the byte range
-for each decoded field. Every resource ID links back to the request that
-created it.
-
-Here is a trivial client — open a window, draw something. **Twenty-two
-messages. About five milliseconds.**
-
-*[step — flip the preset to Slow 3G, re-run. Say nothing while it runs.]*
-
-Same twenty-two messages. **Two point nine seconds.**
-
-Nothing about the program changed.
-
-*[step]* And fittingly — this tool's own UI is an X11 application built with
-react-x11. The visualizer is one of its own clients.
-
-## Four budgets, and they fight
-
-So performance here is not one number, it is four, and they trade against each
-other, which is unusual and is what makes it interesting.
-
-- **Network** — round trips and bytes to the display server.
-- **Local CPU** — layout, shaping, diffing, in my process.
-- **Server CPU** — what the X server does with what I sent it.
-- **The raster gate** — how often you are allowed to draw at all. Vsync, the
-  compositor, the display's refresh.
+*[step]* **Network** — round trips and bytes to the display server. **Local
+CPU** — layout, shaping, diffing, in my process. **Server CPU** — what the X
+server does with what I sent. And **the raster gate** — how often you are
+allowed to draw at all.
 
 *[step]* Optimising one usually spends another. Fewer, larger requests helps
 the network and costs server memory. Caching glyphs helps server CPU and costs
-a round trip to set it up. More layout work locally saves round trips and costs
-frame time.
+a round trip to set up.
 
 There is no single dial. There is a budget you are currently failing, and you
 go and find out which one.
 
-## Text is uploaded once, then referenced
+## 29 · Text is uploaded once, then referenced
 
-Let me show you the prettiest mechanism in the whole thing, because it is the
-one that makes all four budgets happy at the same time.
+The prettiest mechanism in the whole thing, because it is the one that makes
+all four budgets happy at once.
 
-Text. XRender has **glyph sets**: you upload a glyph's bitmap once and you get
-back an ID.
+XRender has **glyph sets**: you upload a glyph's bitmap once and get back an
+id.
 
-*[step]* So — `fontkit` shapes a string, which gives me positioned glyph IDs. I
-check which of those the server has not seen and upload only those. Then
-`RenderCompositeGlyphs` draws the entire run **by ID**.
+*[step]* `fontkit` shapes a string, which gives me positioned glyph ids. I
+check which of those the server has not seen, and upload only those. Then one
+request draws the whole run **by id**.
 
-Which means a paragraph you have shown before costs one request containing a
-list of small integers. Not pixels. Not even characters. Integers.
+*[step]* Which means a paragraph you have shown before costs one request
+containing a list of small integers. Not pixels. Not even characters.
+Integers.
 
 *[step]* And here is the trick that made me laugh when I found it. **A glyph
-does not have to be a letter.**
+does not have to be a letter.** Upload a solid one-by-one square as a glyph,
+composite it in a run with positions and a colour, and that is a filled
+rectangle — a run of them is hundreds of filled rectangles in one request.
 
-Upload a solid 1×1 square as a glyph. Composite it in a run, with positions and
-a colour. That is a filled rectangle — and a run of them is *hundreds* of
-filled rectangles in one request. That is how a terminal draws every cell
-background on screen in a single call.
-
+That is how a terminal draws every cell background on screen in a single call.
 The text-drawing path turned out to be the fastest rectangle-drawing path.
 
-## Every real optimisation was "don't"
+## 30 · Every real optimisation was "don't"
 
-Here is the part that transfers even if none of you ever write an X11 client.
+The part that transfers even if none of you ever write an X11 client. I went
+back through everything I actually did to make this fast, and there was not
+one clever algorithm in it. Every single one was a **refusal** — and there is
+one per budget, which is what makes them a set.
 
-I went back through everything I actually did to make this fast, and there was
-not one clever algorithm in it. Every single one was a **refusal**. Four of
-them, one per budget:
+*[step]* **Don't draw detail nobody can see** — decimate a three-thousand
+point series to the pixels it covers. **Don't draw too often** — frame gates,
+and pacing that adapts to how long the last frame took. **Don't redraw what
+did not move** — clip to the viewport, track damage. **Don't send it twice** —
+glyph sets, and geometry in a server-side display list.
 
-- **Don't draw detail nobody can see.** *(local CPU)*
-- **Don't draw too often.** *(the raster gate)*
-- **Don't redraw what did not move.** *(server CPU)*
-- **Don't send it twice.** *(network)*
+*[step]* The terminal got **three times faster on macOS by drawing less
+often.** Not by drawing faster. I did not change a single drawing call.
 
-*[step]* The terminal got three times faster on macOS by drawing *less often*.
-Not by drawing faster. I did not change a single drawing call.
+## 31 · Two of the four, running
 
-*[step]* Those four are the next slide, running. One each.
+*[DEMO SLIDE. 3 min, hard stop. `reveal: replace`. Stop both before moving
+on.]*
 
-## The four refusals, running  *(DEMO — `reveal: replace`)*
+**Don't draw detail nobody can see.** *[The panel.]* This is the deck's own
+commit history — a few dozen points, which is the right size for a slide and
+the wrong size for the claim.
 
-*[One sentence per demo. Then stop talking and let it run.]*
+So: *[press the button]*. That is the components package's own charts example,
+in its own window. A million-point series. A streaming section appending sixty
+points a second. Small multiples at ninety pixels wide. And under each chart a
+HUD printing what the last painted frame actually cost — mode, span, command
+count, wire bytes.
 
-**Don't draw detail nobody can see.** Three thousand points on an
-eight-hundred-pixel chart is more points than pixels. Decimated to what the
-axis can actually resolve — visually identical, a quarter of the work. Resize
-it and it re-decimates.
+*[Zoom in and out of the million and read the byte count out loud.]* It does
+not move. **Cost follows pixels, not points.** *[Scroll a chart out of view
+and its frame counter freezes — an invisible chart neither paints nor
+schedules, while its store keeps appending.]*
 
-*[step]* **Don't draw too often.** A terminal, flooded with twenty thousand
-lines. Glyph runs for the text, glyph runs for the backgrounds — and a frame
-gate deciding how much of that torrent you actually see. The output is correct
-either way; the only question is how many frames you spent on it.
+*[step]* **Don't draw too often.** *[The flood — twenty thousand lines.]*
+Glyph runs for the text, glyph runs for the backgrounds, and a frame gate
+deciding how much of that torrent you actually see. The output is correct
+either way. The only question is how many frames you spent on it.
 
-*[step]* **Don't redraw what did not move.** Pan and zoom over a node graph.
-That is a scale on a subtree, and damage tracking working out that most of the
-screen is exactly where it was.
-
-*[step]* **Don't send it twice.** Geometry, in a server-side display list. The
-vertices cross the wire **once**, at startup. Every frame after that is one
-`CallList` — a few bytes, for all of that.
+*[The other two refusals were the showcase: the flow graph pans and zooms over
+a subtree scale, and the GL scene is one `CallList` a frame. Point back rather
+than showing them twice.]*
 
 ---
 
-# Act IV — what it cost, and how it got built (4:30)
+# What it cost — 5:00
 
-## Then macOS happened
+## 32 · Then macOS happened
 
-Now the honest part.
+Now the honest part, and the decision I said I would have to defend.
 
-I said I would come back to the presenter. The presenter is the interface
-between the component tree and the platform: what a window is, what a surface
-is, how a frame reaches a screen. There is one for X11. And now there is one
-for Core Animation — layers instead of windows, CoreGraphics instead of
-XRender.
+The presenter is the interface between the component tree and the platform:
+what a window is, what a surface is, how a frame reaches a screen. There is
+one for X11. And now there is one for Core Animation — layers instead of
+windows, CoreGraphics instead of XRender.
 
-Same component tree. Same yoga layout. Same event model. Same components. One
-layer per real window, everything else painted into it.
+*[step]* Same component tree. Same yoga layout. Same event model. Same
+components. One layer per real window, everything else painted into it.
+
+*[Callback: that is the "one window, paint everything into it" decision from
+the protocol section, paying for itself on a platform X11 never touched.]*
 
 *[step]* And the cost: the AppKit bridge is a **compiled module**. `node-gyp`
 is back. Fifteen years of "pure JS, no bindings" and I broke it.
 
-*[step]* Which is fine, and I want to be clear about why. **"No binary modules"
-was never the goal. It was a constraint** — and it was a good one, because it
-forced me to actually implement things instead of binding to something that
+*[step]* Which is fine, and I want to be clear about why. **"No binary
+modules" was never the goal. It was a constraint** — and a good one, because
+it forced me to actually implement things instead of binding to something that
 already had. It is the reason the layout, text and paint layers are honest
 portable code rather than a thin wrapper around a C library.
 
@@ -639,42 +866,47 @@ spending it on. Wayland and Windows are the same shape of problem — and they
 are easier now, because the first backend proved the seam was in the right
 place.
 
-*[beat]* This deck is running on that backend right now.
+*[Beat: this deck is running on that backend right now.]*
 
-## The loop
+## 33 · The loop
 
-One more thing about how this gets built, because I think it is what made the
-API coherent.
+One thing about how this gets built, because I think it is what made the API
+coherent.
 
-*[step]* Three steps:
-
-1. **Draft** an application that wants something.
-2. Find the **gap** — the thing this app is about to write for itself, that
-   every app would have to write for itself.
-3. **Promote** it: out of the app, into the components package, and if it is
-   fundamental enough, into core.
+*[step]* Three steps. **Draft** an application that wants something. Find the
+**gap** — the thing this app is about to write for itself, that every app
+would have to write for itself. Then **promote** it: out of the app, into the
+components package, and if it is fundamental enough, into core.
 
 *[step]* `<Markdown>` exists because a chat client needed it. Drag and drop
-moved into core because a reorderable list and a file-drop target turned out to
-want the same two props. Nothing here was designed in the abstract. Everything
-is here because something concrete was missing it.
+moved into core because a reorderable list and a file-drop target turned out
+to want the same two props. Nothing here was designed in the abstract.
 
-*[step]* This deck did it too — it found one this week. A markdown code fence
-knows its *language*, but the renderer never hands it the rest of the info
-string. Which is a real gap, because that is where line highlighting would go.
+*[step]* And it happened to this deck while I was writing it. The desktop
+calendar you saw earlier used to live in the components package; it moved into
+core between two `npm install`s, because reading the user's calendar is one of
+the things an app does *outside* its own windows — like notifications and the
+tray — and the macOS side of that can only be reached from core. The migration
+was two import lines.
 
-## Fifteen years, and then seven weeks
+## 34 · The dates
 
-*[timeline]*
+*[Read the first three at normal pace.]* node-x11, 2011. ntk, 2012. react-x11,
+2015 — and then essentially nothing for eleven years.
 
-Those are the dates. node-x11 in 2011. ntk in 2012. react-x11 in 2015 — and
-then, essentially, nothing for eleven years.
-
-*[step — pause. Let the colour land. Do not talk over it.]*
+*[step — PAUSE before pressing. Let the colour land. Do not talk over it.]*
 
 That is seven weeks.
 
-## The honest version
+## 35 · The same seven weeks, by volume
+
+*[Same story, counted instead of dated. Say "it sat there for eleven years"
+and nothing else — do NOT re-land "seven weeks", the last slide already did
+and saying it twice spends the pause you took for it.]*
+
+*[step — the axis rescales under the last bar. Say nothing. Wait.]*
+
+## 36 · So: AI-assisted development
 
 I want to be careful about how I say this, because the honest version is more
 interesting than the marketing one.
@@ -682,68 +914,90 @@ interesting than the marketing one.
 **The loop did not change.** Draft, find the gap, promote. What changed is the
 *cycle time* between having an idea and knowing whether it was any good.
 
-*[step]* What actually changed:
+*[step]* What actually changed. The **design record became the unit of work**
+— a written spec per component, before the code and kept after it. Which is,
+again, a protocol: an agreement written down before either side implements it.
+**Reading and reviewing** became the bottleneck instead of typing. And **"try
+it as a throwaway" got cheap enough to do first**, every time — most of the
+good decisions in this toolkit are the second or third version of something I
+threw away.
 
-- The **design record became the unit of work** — a written spec per component,
-  before the code and kept after it. Which is, again, a protocol: an agreement
-  written down before either side implements it.
-- **Reading and reviewing** became the bottleneck instead of typing.
-- **"Try it as a throwaway" got cheap enough to do first**, every time. Most of
-  the good decisions in this toolkit are the second or third version of
-  something I threw away.
-
-*[step]* What did not change:
-
-- Deciding **what** to build, and — much harder — what to refuse to build.
-- **Protocol-level debugging.** A wrong byte is still a wrong byte, and nothing
-  helps with that except the visualizer and patience.
-- **Taste.** Every API I have shown you today is a judgement call, and the
-  judgement is fifteen years old.
+*[step]* What did not. Deciding **what** to build, and — much harder — what to
+refuse to build. **Protocol-level debugging**: a wrong byte is still a wrong
+byte, and nothing helps except the visualizer and patience. And **taste**.
+Every API I have shown you today is a judgement call, and the judgement is
+fifteen years old.
 
 *[step]* So the honest summary is: this is not "AI wrote a UI toolkit". It is
 fifteen years of knowing exactly what I wanted, finally meeting a fast enough
 typist.
 
-## The bar has moved
-
-*[screenshot. Deadpan. Do not explain it.]*
-
-> Cure cancer, then open a PR
-
-*[beat]*
-
-The second half is the easy part now.
-
 ---
 
-# Close (1:15)
+# Close — 1:30
 
-## What's next
+## 37 · What's next for react-x11
 
-Real things, not a wishlist:
+Real things, not a wishlist. **MDX in `<Markdown>`** — components interleaved
+with prose; this deck is the forcing function. **More backends** — Wayland,
+and Windows, behind the same tree. **Accessibility** — AT-SPI is wired, the
+coverage is not finished, and this is the one I would most like help with. And
+**the workbench**, a Storybook for a desktop toolkit, which is how everything
+you saw on the showcase gets built.
 
-- **MDX in `<Markdown>`** — components interleaved with prose. This deck is the
-  forcing function and it is most of the way there.
-- **More backends** — Wayland, and Windows, behind the same tree.
-- **Accessibility** — AT-SPI is wired, the coverage is not finished. This is
-  the one I would most like help with.
-- **The workbench** — a Storybook for a desktop toolkit. It is how the
-  components on these slides get built.
+*[step]* All of it is on GitHub and the good-first-issues are real ones.
 
-All of it is on GitHub and the good-first-issues are real ones.
-
-## It's all just bytes on a socket
+## 38 · It's all just bytes on a socket
 
 So — the idea I wanted to leave you with.
 
 A desktop toolkit is a protocol client. The wire carries drawing, not pixels.
-Belonging to a desktop is a dozen conversations, none of which involve a pixel.
-React's reconciler is a protocol. DevTools is a protocol. And the presenter is
-a protocol I wrote for myself, which is the only reason there is a second
+Belonging to a desktop is a dozen conversations, none of which involve a
+pixel. React's reconciler is a protocol. DevTools is a protocol. The presenter
+is a protocol I wrote for myself, which is the only reason there is a second
 backend.
 
-It is all just bytes on a socket.
+And an Electron app is one too — it is just a protocol you had to invent.
 
-*[links]*
+It's all just bytes on a socket.
 
-Questions. And this slide is an X11 client too.
+*[step — the links.]*
+
+*[step]* Questions. And this slide is an X11 client too.
+
+*[If nobody asks anything, the reliable opener is: "ask me why it's not
+Wayland first."]*
+
+---
+
+# Timing, and what to cut
+
+| act | slides | budget |
+| --- | --- | --- |
+| Cold open | 01–02 | 2:30 |
+| The wire | 03–11 | 9:00 |
+| Why build one | 12–15 | 5:30 |
+| React, without a DOM | 16–19 | 6:00 |
+| What's in the box | 20–24 | 7:00 |
+| Under the hood | 25–27 | 4:30 |
+| Make it fast | 28–31 | 6:00 |
+| What it cost | 32–36 | 5:00 |
+| Close | 37–38 | 1:30 |
+
+**47 minutes.** That does not fit, and the honest thing is to decide the cuts
+now rather than discover them at minute 35. In order:
+
+1. **Showcase steps 2, 3 and 4** (−2:00). The notes already say cut to 1, 5
+   and 6.
+2. **Slide 07, atoms and properties** (−1:30). The "no policy" line can move
+   onto slide 12, which makes the same argument.
+3. **Slide 10, wire events** (−1:00). 09 and 11 carry the wire; the event mask
+   is a sentence on 09.
+4. **Slide 28, four budgets** (−1:30). Slide 30 names all four in its bullets
+   already; the "they fight" trade-off becomes its first step.
+5. **Slide 24, Fast Refresh** (−2:00). The most painful cut on the list, and
+   still the right one if you are at minute 30 with eight slides left.
+
+That lands **39 minutes** with 1–5 applied, and leaves the spine intact: the
+thesis, the wire, the two ceilings, the bill, the program, the roadblock, the
+refusals, and the honest ending.

@@ -2,7 +2,7 @@
 
 Companion to [narration.md](narration.md), which is the spoken script.
 
-**37 slides, 121 steps, 40-minute slot.** This file was a proposal against a
+**38 slides, 131 steps, 40-minute slot.** This file was a proposal against a
 24-slide deck; PRs #1 and #2 then landed eight demo slides, so most of the
 original reordering argument is obsolete and has been dropped rather than
 forced onto a deck that had already moved. What survived, what was added, and
@@ -159,6 +159,49 @@ bytes. Zoom the million and the byte count does not move.
 Separate process for two reasons: it needs its own connection and frame clock
 or the HUD reports *this deck's* frames, and a demo that can wedge itself on a
 million points should not be able to take the talk down with it.
+
+## The coherence pass
+
+A read of the whole deck end to end, as prose rather than as slides. Eight
+things were wrong and most were invisible one slide at a time — the full list
+is in the `fix(slides)` commit. The two that mattered:
+
+**Two promises the deck did not keep.** Slide 4 asked *"so what is a
+toolkit?"* and then spent seven slides on the protocol before answering it on
+12. And slide 15 promised *"six good reasons"* it was a bad idea and never
+enumerated them — the reasons are slide 16's list of everything the DOM was
+doing for you, so it now says the bill arrives next, and it does.
+
+**Three things said twice.** The showcase had three consecutive steps titled
+"A series, a sequence, a graph" — under `reveal: replace` the heading is the
+only thing that changes, so an identical one three times reads as a stuck
+deck. `<HtmlPlayground>`'s slide duplicated showcase step 2, which already has
+`<Html>` behind a tab. And the calendar slide's prose duplicated the
+component's own panel.
+
+**`src/acts.ts`** — the footer now carries the section name beside the
+counter, changing eight times across the talk. `23 / 38` tells a presenter how
+much is left and an audience nothing at all. A range table rather than
+frontmatter, because an act is a property of the *order*: inserting a slide
+should move the boundary after it, which an index range does for free and a
+per-file key gets silently wrong.
+
+## Timing — the honest version
+
+The acts add up to **47 minutes**, which does not fit a 40-minute slot.
+[narration.md](narration.md) ends with a five-step cut ladder that lands 39
+minutes with the spine intact; deciding those cuts now beats discovering them
+at minute 35. In order: three showcase steps, the atoms slide, the wire-events
+slide, the four-budgets slide, and — painfully, only if you are at minute 30
+with eight slides left — Fast Refresh.
+
+## Components with no slide
+
+`<HtmlPlayground>`, `<Stats>`, `<Metric>` and `<Placeholder>` are in the map
+and on no slide. All four are deliberate: the playground's slide was pruned
+and is one `git revert` away, `<Stats>` and `<Metric>` are what a number would
+come back as if one ever should, and `<Placeholder>` is for writing, which the
+smoke guard is what makes safe.
 
 ## Still open
 
