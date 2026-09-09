@@ -81,10 +81,17 @@ export function HtmlPlayground({
         />
         <Html
           source={text}
-          // The document is whole on every keystroke, so the parser is not
-          // being streamed: `partial` left true would try to write each
-          // edit as a delta on the last one.
-          partial={false}
+          // `partial` is left at its default, even though the document here
+          // is whole on every keystroke and `partial={false}` is the honest
+          // prop for that. Set, it makes `<Html>` end the parser on the first
+          // render, and the next keystroke that *appends* is then written as
+          // a delta into a finished parser — `.write() after done!`. Nothing
+          // is mis-parsed in the meantime: `HtmlSource` re-parses whenever the
+          // new source is not a prefix of the last, so a mid-document edit is
+          // never mistaken for a stream.
+          //
+          // Workaround for sidorares/react-x11-components#77; take
+          // `partial={false}` back once that lands.
           style={{
             flexGrow: 1,
             padding: 14,
