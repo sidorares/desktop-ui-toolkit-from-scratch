@@ -19,12 +19,35 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { Button, createRoot } from 'react-x11';
 
+import { backendRemedy, missingBackend } from '../src/devtools-backend.js';
+
+// **Hook sources need more than ten stack frames.** React works out where a
+// hook was called from by capturing a stack, and V8 keeps ten frames by
+// default — `tsx` adds about ten of its own below every hook call, so the
+// call site falls off the end, the backend reports a `hookSource` of nulls,
+// and DevTools shows the hooks *unnamed* with `Hook source code location not
+// found.` in its console. On a slide whose whole point is "look at the props
+// and the hook state", that is the demo failing quietly.
+//
+// Set here rather than as `--stack-trace-limit=50` on the command line
+// because there are three ways this file gets run — the slide's button, `npm
+// run example:devtools`, and a presenter typing the line off the slide — and
+// only one of them goes through a launcher. Fifty is far more than the ten
+// frames `tsx` costs and still nothing next to what a stack capture is for.
+Error.stackTraceLimit = Math.max(Error.stackTraceLimit ?? 10, 50);
+
 /** Whether this process was started the way the demo wants. Said on screen,
  *  because a window that looks fine while nothing is connected is the most
  *  confusing thing that can happen on stage. */
 const BRIDGE = process.env.REACT_X11_DEVTOOLS === '1';
 const HOST = process.env.REACT_X11_DEVTOOLS_HOST || 'localhost';
 const PORT = process.env.REACT_X11_DEVTOOLS_PORT || '8097';
+
+/** The third state, and the one worth having a line for: the flag is set and
+ *  the backend cannot be imported. react-x11 warns on stdout and runs on
+ *  without a bridge, so without this the window is indistinguishable from a
+ *  healthy one whose DevTools is slow to connect. */
+const MISSING = BRIDGE ? missingBackend(import.meta.url) : [];
 
 /** One labelled row. Named, because the tree should read as a list of nouns. */
 function Panel({
@@ -143,10 +166,17 @@ function App(): ReactElement {
     >
       <box style={{ flexGrow: 1, padding: 18, gap: 12 }}>
         <text style={{ fontSize: 19 }}>Inspect me</text>
-        <text style={{ fontSize: 12, color: '$textMuted' }}>
-          {BRIDGE
-            ? `bridge on — talking to ${HOST}:${PORT}`
-            : 'bridge off — restart with REACT_X11_DEVTOOLS=1'}
+        <text
+          style={{
+            fontSize: 12,
+            color: MISSING.length ? '$danger' : '$textMuted',
+          }}
+        >
+          {!BRIDGE
+            ? 'bridge off — restart with REACT_X11_DEVTOOLS=1'
+            : MISSING.length
+              ? `bridge unavailable: ${backendRemedy(MISSING)}`
+              : `bridge on — talking to ${HOST}:${PORT}`}
         </text>
         <Counter step={1} />
         <Greeting />

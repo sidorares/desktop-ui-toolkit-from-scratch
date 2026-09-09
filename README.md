@@ -320,11 +320,35 @@ slide and back finds the demo still running.
 button does both, in that order, because the backend connects to a socket
 that has to already be listening. The deck cannot inspect *itself*:
 `REACT_X11_DEVTOOLS` is read before React's first commit, so what opens is a
-second app, [`examples/devtools-demo.tsx`](examples/devtools-demo.tsx). The
-three packages it needs — `react-devtools`, `react-devtools-core`, `ws` — are
-devDependencies, so `npm install` has them; the first drags in Electron, which
-is most of the install. A DevTools already listening on 8097 is used as it
-stands rather than replaced.
+second app, [`examples/devtools-demo.tsx`](examples/devtools-demo.tsx).
+
+`react-devtools-core` and `ws` are **dependencies**, not devDependencies.
+react-x11 imports them lazily and only *warns* when the import fails, so a
+checkout without them puts an app window on the projector that looks entirely
+right and a DevTools window that waits for a connection which can never
+arrive — the hardest of the three failure modes to diagnose in front of a
+room, and the only evidence is a line of stdout. So the launcher resolves
+both before it spawns anything and puts `npm install` on the slide instead of
+starting a demo that cannot work, the app says the same on its own window,
+and `npm run check:launchers` reports it. `react-devtools` — the standalone,
+and the hundred megabytes of Electron behind it — stays a devDependency,
+since a machine without it falls back to `npx`. A DevTools already listening
+on 8097 is used as it stands rather than replaced.
+
+**Two things to know before giving that slide.** The demo raises
+`Error.stackTraceLimit`: React works out where each hook was called from by
+capturing a stack, V8 keeps ten frames, and `tsx` spends about ten of them,
+so without it the call site falls off the end and every hook comes up
+*unnamed* — on the slide whose whole point is looking at hooks. And
+**selecting a component in the tree can kill the DevTools window.** It is
+deterministic with ⚙ → Components → "always parse hook names for the
+selected element" on and still a coin flip with it off, in the standalone
+rather than in anything this repo or react-x11 sends it — so it is a
+rehearsal check (turn that setting off) and a recovery, not something fixable
+here. The recovery is the second button: **Restart DevTools** restarts the
+frontend alone and the app, which survives the crash, reconnects to the new
+one by itself. Stop and start again would take the tree the room was looking
+at with it.
 
 **Hot reload** (23) — `npm run example:hot`. The second button rewrites two marked
 lines in [`examples/hot-demo-app.jsx`](examples/hot-demo-app.jsx), which is a
@@ -413,6 +437,7 @@ Present on Cocoa.
 | `src/prose.tsx` | `<Markdown>` with the deck's typography, components and scope |
 | `src/processes.ts` | spawning, stopping and watching a demo's child processes |
 | `src/devtools.ts` | the DevTools pair: the UI, the port, then the app |
+| `src/devtools-backend.ts` | whether the bridge can be loaded at all, asked by both halves |
 | `src/hotreload.ts` | the refresh-loader run, and the edit the slide makes |
 | `src/x11vis.ts` | finding the visualizer, and pointing an example at it |
 | `src/html-language.ts` | an HTML mode for `<CodeEditor>`, written for slide 13 |
