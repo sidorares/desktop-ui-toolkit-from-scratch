@@ -28,12 +28,12 @@ const ACTS: readonly Act[] = [
   { from: 0, name: null },
   { from: 2, name: 'the wire' },
   { from: 11, name: 'why build one' },
-  { from: 15, name: 'React, without a DOM' },
-  { from: 19, name: "what's in the box" },
-  { from: 24, name: 'under the hood' },
-  { from: 27, name: 'make it fast' },
-  { from: 31, name: 'what it cost' },
-  { from: 36, name: null },
+  { from: 16, name: 'React, without a DOM' },
+  { from: 20, name: "what's in the box" },
+  { from: 25, name: 'under the hood' },
+  { from: 28, name: 'make it fast' },
+  { from: 32, name: 'what it cost' },
+  { from: 37, name: null },
 ];
 
 /** The section a slide is in, or `null` outside the argument. */

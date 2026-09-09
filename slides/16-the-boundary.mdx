@@ -1,0 +1,53 @@
+---
+title: Where you put the boundary
+notes: |
+  THE HINGE. This is the most important minute in the first half, and it is
+  what the last three slides were for.
+  Do NOT say "what if there were no boundary" — there is one, it is the
+  socket, and this room has been staring at it for nine slides. Claiming
+  otherwise contradicts the thesis and somebody will call it in questions.
+  The argument is that a boundary cannot be removed, only PLACED, and that
+  the three designs differ in *where* — not in *whether*.
+  Read the third row last and slowly. The point is not that mine is smaller;
+  it is that mine is the only one somebody else already specified, and the
+  only one you can read without asking permission.
+  "Extended many times, never broken" is the honest phrasing and it is a
+  better point than "unchanged": XRender arrived in 2000 and this deck's text
+  runs on it, which is what a good extension mechanism buys you.
+  Then hand off as a QUESTION, because the next slide answers it with two
+  halves of very different sizes and opens with the small one.
+  This slide is not on the cut ladder. If you are behind, lose showcase
+  steps — not this.
+  90 seconds.
+---
+
+# You cannot remove it. You can only place it.
+
+The pixels are not yours. The display server owns them, so **something** has
+to cross that gap — and every design we have looked at has a boundary in it,
+including mine.
+
+They differ in *where*, not in *whether*:
+
+^^^
+
+| the boundary sits between | and it is |
+| --- | --- |
+| **Electron** — your UI and the desktop | an IPC channel you invented, and you are its only implementer |
+| **a binding** — your code and the widgets | a language bridge you cannot see into |
+| **this** — you and the display server | a protocol specified in 1987 — extended many times, never broken — and the one you watched decode itself |
+
+^^^
+
+> So put it at the socket.
+
+Below the wire is somebody else's problem — written down, forty years old,
+and the same on every machine that speaks it.
+
+Above the wire is **all yours.**
+
+^^^
+
+Which is a much bigger "all" than it sounds.
+
+So: what does owning everything above a socket actually leave you to write?

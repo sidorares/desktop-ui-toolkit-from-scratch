@@ -3,7 +3,7 @@
 The talk as spoken, start to finish. Read it top to bottom; if the story does
 not hold here it will not hold on stage.
 
-**38 slides, 132 steps, a 40-minute slot.** One heading per slide, in order,
+**39 slides, 134 steps, a 40-minute slot.** One heading per slide, in order,
 so this file and `slides/` can be read side by side.
 
 Stage directions in *[brackets]*. `[step]` is a `^^^` reveal. **Demo slides get
@@ -394,23 +394,53 @@ loop and their build story. And the layer you most want to change is the layer
 you cannot reach.
 
 *[step]* So both columns are a boundary. One puts it between your UI and the
-desktop; the other between your code and the widgets.
+desktop; the other between your code and the widgets. Which is the thing
+worth sitting with for a moment.
 
-*[step]* The question this talk is: **what if there were no boundary?** What
-if the layout, the text, the painting and the protocol were all just
-JavaScript you could open and read?
+*[End on the observation, not on a conclusion. Put the word "boundary" in the
+room's hands and step.]*
 
-And the answer is that it is a *lot* of work — work the browser and Qt had
-both already done for you, which is exactly why they are reasonable answers.
-The next slide is the bill.
+## 16 · You cannot remove it. You can only place it.
+
+*[THE HINGE. The most important minute in the first half, and what the last
+three slides were for.]*
+
+The pixels are not yours. The display server owns them, so **something** has
+to cross that gap — and every design we have looked at has a boundary in it,
+including mine. They differ in *where*, not in *whether*.
+
+*[step — the table. Read the third row last, and slowly.]*
+
+Electron puts it between your UI and the desktop, and it is an IPC channel
+you invented and are the only implementer of. A binding puts it between your
+code and the widgets, and it is a language bridge you cannot see into.
+
+This puts it between you and the display server — and that one is a protocol
+specified in 1987, extended many times and never broken, and the one you
+watched decode itself twenty minutes ago.
+
+*[The point is NOT that mine is smaller. It is that mine is the only one
+somebody else already specified, and the only one you can read without asking
+permission.]*
+
+*[step]* So put it at the socket. Below the wire is somebody else's problem —
+written down, forty years old, and the same on every machine that speaks it.
+Above the wire is **all yours.**
+
+*[step]* Which is a much bigger "all" than it sounds.
+
+So: what does owning everything above a socket actually leave you to write?
 
 ---
 
 # React, without a DOM — 6:00
 
-## 16 · React needs a host, not a DOM
+## 17 · React needs a host, not a DOM
 
-The good news is that React does not need a DOM. It needs a **host**.
+Two answers to that, and they are wildly different sizes. Here is the small
+one.
+
+React does not need a DOM. It needs a **host**.
 `react-reconciler` — the package React DOM and React Native are both built on
 — asks for a host config: how to make a thing, put it in another thing, and
 update it.
@@ -421,9 +451,9 @@ too** — the third row of the table from the cold open.
 *[step]* That part is a weekend. Genuinely — a weekend gets rectangles on
 screen that update when state changes.
 
-*[step]* And here is the bill I promised. When you remove the DOM you do not
-just lose an API; you lose everything it was quietly doing for you and never
-mentioned.
+*[step]* And here is the large one. Because the DOM was never just a tree of
+nodes — when you remove it you lose everything it was quietly doing for you
+and never mentioned.
 
 *[Read this list slowly. It is the honest scope of "from scratch".]*
 
@@ -436,13 +466,13 @@ traversal order, focus scopes, what a modal takes and gives back.
 *[step]* **That** is "from scratch". The reconciler is the easy end of it —
 the browser has been doing that list for you your entire career.
 
-## 17 · Hello, desktop
+## 18 · Hello, desktop
 
 Ten minutes of me talking about a toolkit and you have not seen a program.
 
-*[The code.]* That is the file. `node app.jsx`, and there is a window on your
-screen. No bundler, no dev server, no `index.html` with a div in it to mount
-into.
+*[The code.]* That is the file. **`bun app.jsx`**, and there is a window on
+your screen. No bundler, no dev server, no `index.html` with a div in it to
+mount into — and no build step, because the JSX is transpiled on the way in.
 
 *[step]* And those last two lines are the bottom of this deck's own
 `src/main.tsx`. Not a simplified example — what is running.
@@ -457,7 +487,7 @@ and dialogs are the same machinery, not a special case.
 *[Callback: that is the thing the browser slide said was impossible. A popup
 here is a real window, not a div clipped to a viewport.]*
 
-## 18 · One line had already done this
+## 19 · One line had already done this
 
 `await createRoot()` is one line. Before your first component rendered, it
 connected to the display, loaded the layout engine, **and dialled the session
@@ -476,7 +506,7 @@ second app fighting it for the bus.
 *[step]* That is the dozen conversations from twenty minutes ago, arriving as
 the default arguments of a constructor.
 
-## 19 · It reads like the web, because it should
+## 20 · It reads like the web, because it should
 
 *[The code.]* The goal was one sentence: a web developer should be able to
 read this without translating. Not "looks a bit like CSS" — actually reads.
@@ -502,7 +532,7 @@ re-render.
 
 # What's in the box — 7:00
 
-## 20 · The whole box
+## 21 · The whole box
 
 *[THE SHOWCASE. 4 min, seven steps, `reveal: replace`. One sentence per step,
 then STOP TALKING and let them look. No panel names a height — every one
@@ -562,7 +592,7 @@ this demo is running from, read off disk — not a snippet pasted into a slide.
 *[If behind: cut to steps 1, 5 and 6. Those carry the claim; 2, 3 and 4 are
 what people ask about afterwards.]*
 
-## 21 · Booking a flight, on a desktop
+## 22 · Booking a flight, on a desktop
 
 *[DEMO. Short, and the argument is on the panel to the right — read it rather
 than paraphrasing it.]*
@@ -587,7 +617,7 @@ token that is worth stealing.
 *[That is the strongest argument for desktop integration in the talk. Let it
 sit for a second.]*
 
-## 22 · Your tooling still works
+## 23 · Your tooling still works
 
 *[Section opener for the next two slides. Deliberately short — they do the
 showing.]*
@@ -612,7 +642,7 @@ If it is flaky, describe it; the line lands either way.]*
 
 *[step]* DevTools and Fast Refresh are the next two slides, running.
 
-## 23 · The debugger that ships with React
+## 24 · The debugger that ships with React
 
 *[DEMO, 2–3 min. Press the button FIRST and keep talking — the UI takes a few
 seconds, then the app window appears with the bridge on.]*
@@ -638,7 +668,7 @@ outline itself, once a second.
 *[If it does not come up, the panel says which half failed. Move on — the next
 slide is the one that gets the reaction.]*
 
-## 24 · Fast Refresh, on a window the desktop owns
+## 25 · Fast Refresh, on a window the desktop owns
 
 *[DEMO, 2 min, and the one to rehearse. Start it, click "count me" a few
 times, type something into the field, THEN press the edit button.]*
@@ -665,7 +695,7 @@ cycles three variants and the third press restores the file.]*
 
 # Under the hood — 4:30
 
-## 25 · The ecosystem
+## 26 · The ecosystem
 
 *[Drag a node if the room is warm — it is a real graph, not a picture.]*
 
@@ -688,7 +718,7 @@ base64-inlined WebAssembly, so there is no toolchain and no `node-gyp`.
 `node-x11-dri` is optional, and only if you want OpenGL. And one of them is a
 decision I will have to defend later.
 
-## 26 · What happens when state changes
+## 27 · What happens when state changes
 
 *[Walk it top to bottom, once, slowly.]*
 
@@ -709,7 +739,7 @@ the wire.
 **Paint sends the smallest rectangle that changed.** A cursor blink in a
 terminal is one cell, not one screen.
 
-## 27 · React's render phase is discardable
+## 28 · React's render phase is discardable
 
 Now my favourite bug, because it is a bug you can only have if your host is a
 protocol.
@@ -747,7 +777,7 @@ advice.
 
 # Make it fast — 6:00
 
-## 28 · Four budgets, and they fight
+## 29 · Four budgets, and they fight
 
 Performance here is not one number, it is four, and they trade against each
 other — which is unusual, and is what makes it interesting.
@@ -764,7 +794,7 @@ a round trip to set up.
 There is no single dial. There is a budget you are currently failing, and you
 go and find out which one.
 
-## 29 · Text is uploaded once, then referenced
+## 30 · Text is uploaded once, then referenced
 
 The prettiest mechanism in the whole thing, because it is the one that makes
 all four budgets happy at once.
@@ -788,7 +818,7 @@ rectangle — a run of them is hundreds of filled rectangles in one request.
 That is how a terminal draws every cell background on screen in a single call.
 The text-drawing path turned out to be the fastest rectangle-drawing path.
 
-## 30 · Every real optimisation was "don't"
+## 31 · Every real optimisation was "don't"
 
 The part that transfers even if none of you ever write an X11 client. I went
 back through everything I actually did to make this fast, and there was not
@@ -804,7 +834,7 @@ glyph sets, and geometry in a server-side display list.
 *[step]* The terminal got **three times faster on macOS by drawing less
 often.** Not by drawing faster. I did not change a single drawing call.
 
-## 31 · Two of the four, running
+## 32 · Two of the four, running
 
 *[DEMO SLIDE. 3 min, hard stop. `reveal: replace`. Stop both before moving
 on.]*
@@ -837,7 +867,7 @@ than showing them twice.]*
 
 # What it cost — 5:00
 
-## 32 · Then macOS happened
+## 33 · Then macOS happened
 
 Now the honest part, and the decision I said I would have to defend.
 
@@ -868,7 +898,7 @@ place.
 
 *[Beat: this deck is running on that backend right now.]*
 
-## 33 · The loop
+## 34 · The loop
 
 One thing about how this gets built, because I think it is what made the API
 coherent.
@@ -889,7 +919,7 @@ the things an app does *outside* its own windows — like notifications and the
 tray — and the macOS side of that can only be reached from core. The migration
 was two import lines.
 
-## 34 · The dates
+## 35 · The dates
 
 *[Read the first three at normal pace.]* node-x11, 2011. ntk, 2012. react-x11,
 2015 — and then essentially nothing for eleven years.
@@ -898,7 +928,7 @@ was two import lines.
 
 That is seven weeks.
 
-## 35 · The same seven weeks, by volume
+## 36 · The same seven weeks, by volume
 
 *[Same story, counted instead of dated. Say "it sat there for eleven years"
 and nothing else — do NOT re-land "seven weeks", the last slide already did
@@ -906,7 +936,7 @@ and saying it twice spends the pause you took for it.]*
 
 *[step — the axis rescales under the last bar. Say nothing. Wait.]*
 
-## 36 · So: AI-assisted development
+## 37 · So: AI-assisted development
 
 I want to be careful about how I say this, because the honest version is more
 interesting than the marketing one.
@@ -936,7 +966,7 @@ typist.
 
 # Close — 1:30
 
-## 37 · What's next for react-x11
+## 38 · What's next for react-x11
 
 Real things, not a wishlist. **MDX in `<Markdown>`** — components interleaved
 with prose; this deck is the forcing function. **More backends** — Wayland,
@@ -947,7 +977,7 @@ you saw on the showcase gets built.
 
 *[step]* All of it is on GitHub and the good-first-issues are real ones.
 
-## 38 · It's all just bytes on a socket
+## 39 · It's all just bytes on a socket
 
 So — the idea I wanted to leave you with.
 
@@ -976,15 +1006,15 @@ Wayland first."]*
 | --- | --- | --- |
 | Cold open | 01–02 | 2:30 |
 | The wire | 03–11 | 9:00 |
-| Why build one | 12–15 | 5:30 |
-| React, without a DOM | 16–19 | 6:00 |
-| What's in the box | 20–24 | 7:00 |
-| Under the hood | 25–27 | 4:30 |
-| Make it fast | 28–31 | 6:00 |
-| What it cost | 32–36 | 5:00 |
-| Close | 37–38 | 1:30 |
+| Why build one | 12–16 | 7:00 |
+| React, without a DOM | 17–20 | 6:00 |
+| What's in the box | 21–25 | 7:00 |
+| Under the hood | 26–28 | 4:30 |
+| Make it fast | 29–32 | 6:00 |
+| What it cost | 33–37 | 5:00 |
+| Close | 38–39 | 1:30 |
 
-**47 minutes.** That does not fit, and the honest thing is to decide the cuts
+**48:30.** That does not fit, and the honest thing is to decide the cuts
 now rather than discover them at minute 35. In order:
 
 1. **Showcase steps 2, 3 and 4** (−2:00). The notes already say cut to 1, 5
@@ -993,11 +1023,14 @@ now rather than discover them at minute 35. In order:
    onto slide 12, which makes the same argument.
 3. **Slide 10, wire events** (−1:00). 09 and 11 carry the wire; the event mask
    is a sentence on 09.
-4. **Slide 28, four budgets** (−1:30). Slide 30 names all four in its bullets
+4. **Slide 29, four budgets** (−1:30). Slide 31 names all four in its bullets
    already; the "they fight" trade-off becomes its first step.
-5. **Slide 24, Fast Refresh** (−2:00). The most painful cut on the list, and
-   still the right one if you are at minute 30 with eight slides left.
+5. **Slide 25, Fast Refresh** (−2:00). The most painful cut on the list, and
+   still the right one if you are at minute 30 with nine slides left.
 
-That lands **39 minutes** with 1–5 applied, and leaves the spine intact: the
-thesis, the wire, the two ceilings, the bill, the program, the roadblock, the
-refusals, and the honest ending.
+That lands **40:30** with 1–5 applied, and 39 minutes if the showcase goes to
+three steps rather than four.
+
+**Slide 16 is not on this list.** It is the hinge the three slides before it
+exist to reach, and cutting it turns the whole act into a survey with no
+conclusion. If you are behind at that point, lose showcase steps.

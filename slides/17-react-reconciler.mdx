@@ -1,7 +1,11 @@
 ---
 title: From protocol to React
 notes: |
-  Keep the reconciler part SHORT — this is a JS meetup, they know React has
+  This slide answers the question the previous one ends on — "what does owning
+  everything above a socket leave you to write?" — and the answer has two
+  halves of wildly different sizes. Say that up front, so the good news does
+  not read as the whole answer.
+  Keep the reconciler half SHORT — this is a JS meetup, they know React has
   renderers. Land the "it is a protocol too" line, because it is the third
   row of the table from the cold open and the room should start noticing the
   pattern here.
@@ -11,6 +15,8 @@ notes: |
 ---
 
 # React needs a host, not a DOM
+
+Two answers, and they are wildly different sizes. Here is the small one.
 
 `react-reconciler` — the package React DOM and React Native are both built on
 — asks for a host config. How to make a thing, put it in another thing, and
@@ -31,7 +37,8 @@ That part is a weekend.
 
 ^^^
 
-The rest is everything the DOM was doing for you and never mentioned:
+And here is the large one. Because the DOM was never just a tree of nodes —
+it was doing all of this for you, and never mentioned it:
 
 - **Layout** — no box model, no flow, no line boxes. Yoga, one node per
   element, run client-side
