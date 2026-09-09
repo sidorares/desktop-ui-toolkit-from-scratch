@@ -49,7 +49,12 @@ import {
 import { Prose } from './prose.js';
 import { DECK_THEME } from './theme.js';
 import { actOf } from './acts.js';
-import { PaceLine, reset as paceReset, toggle as paceToggle } from './pacemaker.js';
+import {
+  PaceClock,
+  PaceLine,
+  reset as paceReset,
+  toggle as paceToggle,
+} from './pacemaker.js';
 import { StepProvider } from './steps.js';
 import {
   ZOOM_DEFAULT,
@@ -385,6 +390,7 @@ export function Deck({
                 {act}
               </text>
             ) : null}
+            <PaceClock progress={progress} px={px} />
             {slide.steps > 1 ? (
               <text style={{ fontSize: px(12), color: '$textMuted' }}>
                 {`step ${step + 1}/${slide.steps}`}

@@ -112,7 +112,13 @@ export interface PaceLineProps {
 }
 
 /**
- * The line, and the one number worth having beside it.
+ * The line — and **only** the line.
+ *
+ * The clock lives in `<PaceClock>`, in the footer's own row, because the two
+ * tracks have to be exactly the same width for their fill positions to be
+ * comparable, and that is the entire feature. Rendering the time inside this
+ * row stole its width from the track and quietly made the bottom line shorter
+ * than the top one, which is a bug you can only see by measuring the two.
  *
  * The track is always laid out and only *painted* once the pacemaker is
  * armed: reserving the two pixels means pressing `p` mid-talk does not reflow
@@ -132,42 +138,50 @@ export function PaceLine({ progress, px }: PaceLineProps): ReactElement {
     ms >= TALK_MS ? '$danger' : behind > TOLERANCE ? '$warning' : '$textMuted';
 
   return (
-    <box style={{ flexDirection: 'row', alignItems: 'center', gap: px(8) }}>
+    <box
+      style={{
+        height: px(2),
+        borderRadius: px(1),
+        // The page's own ground when idle, rather than `transparent` —
+        // which is a `<window>` prop here, not a colour value, so it is
+        // not a thing `backgroundColor` is documented to take.
+        backgroundColor: on ? '$border' : '$background',
+      }}
+    >
       <box
         style={{
-          flexGrow: 1,
+          width: `${Math.round(fraction * 1000) / 10}%`,
           height: px(2),
           borderRadius: px(1),
-          // The page's own ground when idle, rather than `transparent` —
-          // which is a `<window>` prop here, not a colour value, so it is
-          // not a thing `backgroundColor` is documented to take.
-          backgroundColor: on ? '$border' : '$background',
+          backgroundColor: on ? colour : '$background',
+          // Matches the tick, so the line slides rather than steps.
+          transition: TICK,
         }}
-      >
-        <box
-          style={{
-            width: `${Math.round(fraction * 1000) / 10}%`,
-            height: px(2),
-            borderRadius: px(1),
-            backgroundColor: on ? colour : '$background',
-            // Matches the tick, so the line slides rather than steps.
-            transition: TICK,
-          }}
-        />
-      </box>
-      {/* Time left, not time spent: "eleven minutes" is a decision and
-          "twenty-nine minutes elapsed" is arithmetic to do on stage. */}
-      {on ? (
-        <text
-          style={{
-            fontSize: px(12),
-            color: colour,
-            fontFamily: '$monoFamily',
-          }}
-        >
-          {running(state) ? mmss(TALK_MS - ms) : `${mmss(TALK_MS - ms)} paused`}
-        </text>
-      ) : null}
+      />
     </box>
+  );
+}
+
+/**
+ * Time **left**, not time spent: "eleven minutes" is a decision and
+ * "twenty-nine minutes elapsed" is a subtraction to do on stage. Sits in the
+ * footer row beside the act name, so it takes no width from the track.
+ */
+export function PaceClock({ progress, px }: PaceLineProps): ReactElement | null {
+  const state = useSyncExternalStore(store.subscribe, store.get);
+  if (!armed(state)) return null;
+  const ms = elapsed(state);
+  const colour =
+    ms >= TALK_MS
+      ? '$danger'
+      : ms - progress * TALK_MS > TOLERANCE
+        ? '$warning'
+        : '$textMuted';
+  return (
+    <text
+      style={{ fontSize: px(12), color: colour, fontFamily: '$monoFamily' }}
+    >
+      {running(state) ? mmss(TALK_MS - ms) : `${mmss(TALK_MS - ms)} paused`}
+    </text>
   );
 }

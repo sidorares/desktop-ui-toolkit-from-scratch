@@ -3,7 +3,7 @@
 The talk as spoken, start to finish. Read it top to bottom; if the story does
 not hold here it will not hold on stage.
 
-**39 slides, 134 steps, a 40-minute slot.** One heading per slide, in order,
+**40 slides, 141 steps, a 40-minute slot.** One heading per slide, in order,
 so this file and `slides/` can be read side by side.
 
 Stage directions in *[brackets]*. `[step]` is a `^^^` reveal. **Demo slides get
@@ -903,7 +903,51 @@ place.
 
 *[Beat: this deck is running on that backend right now.]*
 
-## 34 · The loop
+## 34 · Do we still need X11?
+
+Mostly, **no**. Wayland is where the Linux desktop went, and I am not going to
+stand here and pretend otherwise.
+
+*[Concede the premise immediately and mean it. That is what buys the next
+three steps — a defensive answer here sounds like a man who has not noticed
+what decade it is.]*
+
+*[step]* But as a *first* backend it was the right one, and the reasons are
+about **building** rather than about desktops.
+
+**It is specified** — you can implement it from a document, which is the whole
+of the boundary argument and the reason the first backend was a reading
+exercise rather than a reverse-engineering one. **It is observable** — you
+watched it decode itself, field by field; try that with a shared-memory buffer
+handle. And **it already runs everywhere**: every Wayland desktop ships
+XWayland, so an X11 client is not a subset of Linux, it is all of Linux today,
+unmodified. There are still sessions that come up on X by default.
+
+*[step]* And after the last slide, the honest framing is that **X11 is a
+backend, not the architecture.** One presenter drives it. Cocoa was the
+second. Wayland is high in the plans, and it is the third time rather than the
+first — which was the point of breaking the purity rule.
+
+*[step]* Though there is one thing X11 has that Wayland **deliberately** does
+not.
+
+Wayland is a local compositor protocol: buffers are shared memory and file
+descriptors, and remote display is a layer built on top — waypipe, RDP, a VNC
+server — all of them re-encoding, because there is nothing in the protocol to
+forward.
+
+X11 has been able to put a window from one machine onto another machine's
+screen since 1987, because that is what it was built for.
+
+*[Say "deliberately" out loud. This is not "Wayland is worse" — it dropped
+network transparency on purpose. If somebody asks about waypipe afterwards,
+that is the question you wanted.]*
+
+*[step]* So: do we need X11? No. Do we need *a* protocol — chosen
+deliberately, with the whole toolkit above it unchanged? That was the entire
+argument.
+
+## 35 · The loop
 
 One thing about how this gets built, because I think it is what made the API
 coherent.
@@ -924,7 +968,7 @@ the things an app does *outside* its own windows — like notifications and the
 tray — and the macOS side of that can only be reached from core. The migration
 was two import lines.
 
-## 35 · The dates
+## 36 · The dates
 
 *[Read the first three at normal pace.]* node-x11, 2011. ntk, 2012. react-x11,
 2015 — and then essentially nothing for eleven years.
@@ -933,7 +977,7 @@ was two import lines.
 
 That is seven weeks.
 
-## 36 · The same seven weeks, by volume
+## 37 · The same seven weeks, by volume
 
 *[Same story, counted instead of dated. Say "it sat there for eleven years"
 and nothing else — do NOT re-land "seven weeks", the last slide already did
@@ -941,7 +985,7 @@ and saying it twice spends the pause you took for it.]*
 
 *[step — the axis rescales under the last bar. Say nothing. Wait.]*
 
-## 37 · So: AI-assisted development
+## 38 · So: AI-assisted development
 
 I want to be careful about how I say this, because the honest version is more
 interesting than the marketing one.
@@ -971,7 +1015,7 @@ typist.
 
 # Close — 1:30
 
-## 38 · What's next for react-x11
+## 39 · What's next for react-x11
 
 The list is not "features I have not built yet" any more. It is the work that
 only real use produces.
@@ -1010,7 +1054,7 @@ usually what produces one.]*
 
 *[step]* All of it is on GitHub, and the good first issues are real ones.
 
-## 39 · It's all just bytes on a socket
+## 40 · It's all just bytes on a socket
 
 So — the idea I wanted to leave you with.
 

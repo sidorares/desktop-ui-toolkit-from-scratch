@@ -105,14 +105,15 @@ said.** One slide's worth of pause, not two.
 
 ## 6. Two questions the room will ask, unanswered
 
-**"Why X11 in 2026? Wayland is the future."** The deck says Wayland is "the
-same shape of problem" (33) and the notes suggest inviting the question at the
-end. But it never answers it, and it has a good answer that *strengthens*
-slide 16: X11 is the boundary with forty years of stability behind it, every
-Linux desktop still speaks it through XWayland, and Wayland is a boundary with
-*less* policy in it, not more — a different socket, not a reason to abandon
-the socket. One sentence on 16 or 33 pre-empts the most predictable question
-of the night and makes the thesis look considered rather than nostalgic.
+**"Why X11 in 2026? Wayland is the future."** ~~Unanswered.~~ **Answered:**
+slide 34, *Do we still need X11?*, immediately after Cocoa — because the good
+answer leans on the presenter seam and the seam is only proved on 33. Opens by
+conceding ("mostly, no"), then makes the case for X11 as a *first* backend on
+build-time grounds (specified, observable, universal via XWayland), then lands
+the sting: Wayland dropped network transparency deliberately, and remote
+display is a layer on top rather than a hole in it. Slide 03 carries a
+one-clause promissory note so the wire act is not heard by a room composing an
+objection.
 
 **"Why not React Native for desktop?"** It is the third thing a React room
 thinks of, after Electron and Tauri. 13's notes have the answer (same shape as

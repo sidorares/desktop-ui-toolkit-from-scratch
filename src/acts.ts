@@ -33,7 +33,7 @@ const ACTS: readonly Act[] = [
   { from: 25, name: 'under the hood' },
   { from: 28, name: 'make it fast' },
   { from: 32, name: 'what it cost' },
-  { from: 37, name: null },
+  { from: 38, name: null },
 ];
 
 /** The section a slide is in, or `null` outside the argument. */
