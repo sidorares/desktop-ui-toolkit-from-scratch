@@ -56,6 +56,8 @@ npm run x11
 | `f` | toggle fullscreen (asks the window manager) |
 | `Esc` | hand the keyboard back to the deck, else leave fullscreen |
 | `r` | re-read `slides/` from disk (saves reload on their own) |
+| point at the progress line | the slide under the pointer |
+| click the progress line | go to that slide |
 | `p` | start the **pacemaker**, then pause / resume it |
 | `P` | reset the pacemaker to zero |
 | `⌘+` `⌘-` | **bigger** / **smaller** — `Ctrl` too, for a Linux desktop |
@@ -85,6 +87,28 @@ terminal would otherwise land *inside* the demo, and the arrow keys would
 stop being the deck's. Activating the window clears the focus instead, and
 the click that activated it is spent doing so. The way into a demo is a
 click made while the deck already has the keyboard.
+
+## Jumping about
+
+The progress line is a control. **Point at it** and a label above the pointer
+names the slide under it — number and title — and **click** to go there. The
+hit area is deliberately much taller than the two-pixel line it draws: a
+two-pixel target is a dare, not a control.
+
+A click seeks exactly where the label said, and lands on that slide's *first*
+step, the way every other navigation does.
+
+```bash
+npm run check:scrub
+```
+
+Drives real pointer events through the renderer's own hit testing, because
+none of that is a thing a screenshot can confirm. Two notes for anyone
+extending it: `queryByText` is a **substring** match unless you pass
+`exact` — `'1 / 40'` matches inside `'21 / 40'`, which silently turns every
+position assertion into a false pass — and injected pointer events arrive
+some unknown number of round trips later, so the probes wait for what they
+are about to assert rather than calling `settle()` a fixed number of times.
 
 ## Pacing
 

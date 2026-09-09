@@ -51,10 +51,10 @@ import { DECK_THEME } from './theme.js';
 import { actOf } from './acts.js';
 import {
   PaceClock,
-  PaceLine,
   reset as paceReset,
   toggle as paceToggle,
 } from './pacemaker.js';
+import { Scrubber } from './scrubber.js';
 import { StepProvider } from './steps.js';
 import {
   ZOOM_DEFAULT,
@@ -356,30 +356,11 @@ export function Deck({
             <text style={{ fontSize: px(12), color: '$textMuted' }}>
               {`${index + 1} / ${slides.length}`}
             </text>
-            {/* Two lines, stacked and sharing a width: where the slides have
-                got to, and where the clock has. The gap between them is the
-                only thing a presenter actually needs to read — see
-                `pacemaker.tsx`. */}
-            <box style={{ flexGrow: 1, gap: px(3) }}>
-              <box
-                style={{
-                  height: px(2),
-                  backgroundColor: '$border',
-                  borderRadius: px(1),
-                }}
-              >
-                <box
-                  style={{
-                    width: `${Math.round(progress * 100)}%`,
-                    height: px(2),
-                    backgroundColor: '$accent',
-                    borderRadius: px(1),
-                    transition: 200,
-                  }}
-                />
-              </box>
-              <PaceLine progress={progress} px={px} />
-            </box>
+            {/* Two lines stacked and sharing a width — where the slides have
+                got to, and where the clock has — and both of them a control:
+                point at the track for the slide under the pointer, click to
+                go there. See `scrubber.tsx` and `pacemaker.tsx`. */}
+            <Scrubber slides={slides} index={index} onSeek={go} px={px} />
             {/* The section, in words. A number says how much is left; the
                 name says what the room is currently being told, which is the
                 half a presenter cannot get from the progress bar and an
